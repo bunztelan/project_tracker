@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import crypto from "crypto";
+import { uploadToBlob } from "@/lib/blob";
 
 /* -------------------------------------------------------------------------- */
 /*  Constants                                                                  */
@@ -144,24 +142,16 @@ export async function POST(
       );
     }
 
-    // Save to disk
-    const uuid = crypto.randomUUID();
+    // Upload to Vercel Blob
     const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const diskName = `${uuid}-${safeFileName}`;
-    const relPath = path.join("attachments", id, taskId, diskName);
-    const absDir = path.join(process.cwd(), "uploads", "attachments", id, taskId);
-    const absPath = path.join(absDir, diskName);
-
-    await mkdir(absDir, { recursive: true });
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(absPath, buffer);
+    const pathname = `attachments/${id}/${taskId}/${safeFileName}`;
+    const { url } = await uploadToBlob(file, pathname);
 
     // Create DB record
     const attachment = await prisma.attachment.create({
       data: {
         fileName: file.name,
-        filePath: relPath,
+        filePath: url,
         fileSize: file.size,
         mimeType: file.type || "application/octet-stream",
         taskId,
