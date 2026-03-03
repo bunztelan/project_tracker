@@ -13,6 +13,8 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
 import { KanbanColumn } from "./kanban-column";
 import { TaskCardOverlay, type BoardData, type BoardColumn, type BoardTask } from "./task-card";
 import { TaskDetailDialog } from "./task-detail-dialog";
@@ -357,6 +359,98 @@ export function KanbanBoard({
   );
 
   /* -------------------------------------------------------------------------- */
+  /*  Column management                                                        */
+  /* -------------------------------------------------------------------------- */
+
+  const handleRenameColumn = useCallback(
+    async (columnId: string, newName: string) => {
+      // Optimistic update
+      setColumns((prev) =>
+        prev.map((col) =>
+          col.id === columnId ? { ...col, name: newName } : col
+        )
+      );
+
+      try {
+        const res = await fetch(
+          `/api/projects/${projectId}/board/columns`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "rename", columnId, name: newName }),
+          }
+        );
+
+        if (!res.ok) {
+          const json = await res.json();
+          toast.error(json.message || "Failed to rename column");
+          await refreshBoard();
+        }
+      } catch (error) {
+        console.error("Failed to rename column:", error);
+        toast.error("Failed to rename column");
+        await refreshBoard();
+      }
+    },
+    [projectId, refreshBoard]
+  );
+
+  const handleDeleteColumn = useCallback(
+    async (columnId: string) => {
+      try {
+        const res = await fetch(
+          `/api/projects/${projectId}/board/columns`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete", columnId }),
+          }
+        );
+
+        const json = await res.json();
+
+        if (!res.ok) {
+          toast.error(json.message || "Failed to delete column");
+          return;
+        }
+
+        // Remove from state on success
+        setColumns((prev) => prev.filter((col) => col.id !== columnId));
+      } catch (error) {
+        console.error("Failed to delete column:", error);
+        toast.error("Failed to delete column");
+      }
+    },
+    [projectId]
+  );
+
+  const handleAddColumn = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/projects/${projectId}/board/columns`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "add", name: "New Column" }),
+        }
+      );
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        toast.error(json.message || "Failed to add column");
+        return;
+      }
+
+      // Refresh board to get new column with server-generated ID
+      await refreshBoard();
+    } catch (error) {
+      console.error("Failed to add column:", error);
+      toast.error("Failed to add column");
+    }
+  }, [projectId, refreshBoard]);
+
+  /* -------------------------------------------------------------------------- */
   /*  Render                                                                    */
   /* -------------------------------------------------------------------------- */
 
@@ -379,8 +473,24 @@ export function KanbanBoard({
               tasks={col.tasks}
               onTaskClick={handleTaskClick}
               onQuickAdd={handleQuickAdd}
+              onRename={handleRenameColumn}
+              onDelete={handleDeleteColumn}
+              canDelete={columns.length > 4 && col.tasks.length === 0}
             />
           ))}
+
+          {/* Add column button */}
+          {columns.length < 6 && columns.length > 0 && (
+            <button
+              onClick={handleAddColumn}
+              className="flex w-[320px] shrink-0 flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/50 bg-muted/10 transition-colors hover:border-primary/40 hover:bg-muted/30 min-h-[200px]"
+            >
+              <Plus className="size-6 text-muted-foreground/60" />
+              <span className="mt-2 text-sm text-muted-foreground/60">
+                Add column
+              </span>
+            </button>
+          )}
 
           {columns.length === 0 && (
             <div className="flex flex-1 items-center justify-center py-20">
