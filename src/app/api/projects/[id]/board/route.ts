@@ -111,35 +111,37 @@ export async function GET(
         id: col.id,
         name: col.name,
         position: col.position,
-        tasks: col.tasks.map((task) => ({
-          id: task.id,
-          title: task.title,
-          description: task.description,
-          status: task.status,
-          priority: task.priority,
-          type: task.type,
-          storyPoints: task.storyPoints,
-          position: task.position,
-          dueDate: task.dueDate,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-          assignee: task.assignee,
-          reporter: task.reporter,
-          subtaskCount: task._count.subtasks,
-          commentCount: task._count.comments,
-          attachmentCount: task._count.attachments,
-          totalSubtasks: task._count.subtasks,
-          completedSubtasks: task.subtasks.filter((s: { status: string }) => s.status === "done").length,
-          subtaskProgress: task._count.subtasks > 0
-            ? Math.round(
-                (task.subtasks.filter((s: { status: string }) => s.status === "done").length /
-                  task._count.subtasks) *
-                  100
-              )
-            : 0,
-          parentId: task.parentId,
-          sprintId: task.sprintId,
-        })),
+        tasks: col.tasks.map((task) => {
+          const completedCount = task.subtasks.filter(
+            (s: { status: string }) => s.status === "done"
+          ).length;
+
+          return {
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            type: task.type,
+            storyPoints: task.storyPoints,
+            position: task.position,
+            dueDate: task.dueDate,
+            createdAt: task.createdAt,
+            updatedAt: task.updatedAt,
+            assignee: task.assignee,
+            reporter: task.reporter,
+            subtaskCount: task._count.subtasks,
+            commentCount: task._count.comments,
+            attachmentCount: task._count.attachments,
+            totalSubtasks: task._count.subtasks,
+            completedSubtasks: completedCount,
+            subtaskProgress: task._count.subtasks > 0
+              ? Math.round((completedCount / task._count.subtasks) * 100)
+              : 0,
+            parentId: task.parentId,
+            sprintId: task.sprintId,
+          };
+        }),
       })),
     };
 

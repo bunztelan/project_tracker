@@ -182,8 +182,12 @@ export function KanbanColumn({
             />
           ) : (
             <h3
-              className="truncate text-sm font-semibold text-foreground"
-              title={columnName}
+              className="cursor-pointer truncate text-sm font-semibold text-foreground hover:text-primary transition-colors"
+              onClick={() => {
+                setRenameValue(columnName);
+                setIsRenaming(true);
+              }}
+              title="Click to rename"
             >
               {columnName}
             </h3>
