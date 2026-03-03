@@ -56,6 +56,8 @@ model User {
   reportedTasks  Task[]    @relation("TaskReporter")
   excelUploads   ExcelUpload[]
   projectMembers ProjectMember[]
+  comments       Comment[]
+  attachments    Attachment[]
 }
 
 model Project {
@@ -138,6 +140,8 @@ model Task {
   sprint   Sprint?  @relation(fields: [sprintId], references: [id])
   parent   Task?    @relation("TaskSubtasks", fields: [parentId], references: [id])
   subtasks Task[]   @relation("TaskSubtasks")
+  comments    Comment[]
+  attachments Attachment[]
 }
 
 model Sprint {
@@ -199,4 +203,33 @@ model DashboardWidget {
   dashboardId String
 
   dashboard Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  body      String
+  taskId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task        Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author      User         @relation(fields: [authorId], references: [id])
+  attachments Attachment[]
+}
+
+model Attachment {
+  id           String   @id @default(cuid())
+  fileName     String
+  filePath     String
+  fileSize     Int
+  mimeType     String
+  taskId       String?
+  commentId    String?
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  task       Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  uploadedBy User     @relation(fields: [uploadedById], references: [id])
 }
