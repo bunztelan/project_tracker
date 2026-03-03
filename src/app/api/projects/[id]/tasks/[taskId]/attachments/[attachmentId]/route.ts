@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { unlink } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
+import { deleteFromBlob } from "@/lib/blob";
 
 /* -------------------------------------------------------------------------- */
 /*  Helpers                                                                    */
@@ -77,10 +75,9 @@ export async function DELETE(
       );
     }
 
-    // Delete file from disk
-    const absPath = path.join(process.cwd(), "uploads", attachment.filePath);
-    if (existsSync(absPath)) {
-      await unlink(absPath);
+    // Delete file from Vercel Blob
+    if (attachment.filePath) {
+      await deleteFromBlob(attachment.filePath);
     }
 
     // Delete DB record
