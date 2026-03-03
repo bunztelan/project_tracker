@@ -3,11 +3,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
-  CheckCircle2,
-  Circle,
-  Square,
-  Diamond,
   GripVertical,
+  Paperclip,
+  MessageSquare,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -72,50 +70,19 @@ const PRIORITY_CONFIG: Record<
 > = {
   LOW: {
     label: "Low",
-    className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+    className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
   },
   MEDIUM: {
     label: "Medium",
-    className: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+    className: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
   },
   HIGH: {
     label: "High",
-    className:
-      "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300",
+    className: "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300",
   },
   CRITICAL: {
     label: "Critical",
     className: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300",
-  },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Task type icon helpers                                                    */
-/* -------------------------------------------------------------------------- */
-
-const TYPE_CONFIG: Record<
-  BoardTask["type"],
-  { icon: typeof CheckCircle2; className: string; label: string }
-> = {
-  STORY: {
-    icon: CheckCircle2,
-    className: "text-emerald-500",
-    label: "Story",
-  },
-  BUG: {
-    icon: Circle,
-    className: "text-red-500",
-    label: "Bug",
-  },
-  TASK: {
-    icon: Square,
-    className: "text-blue-500",
-    label: "Task",
-  },
-  EPIC: {
-    icon: Diamond,
-    className: "text-purple-500",
-    label: "Epic",
   },
 };
 
@@ -151,8 +118,6 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
   };
 
   const priority = PRIORITY_CONFIG[task.priority];
-  const typeConfig = TYPE_CONFIG[task.type];
-  const TypeIcon = typeConfig.icon;
 
   const initials = task.assignee
     ? task.assignee.name
@@ -191,38 +156,46 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
         <GripVertical className="size-4 text-muted-foreground" />
       </div>
 
-      {/* Type icon + title */}
-      <div className="flex items-start gap-2 pr-6">
-        <TypeIcon
-          className={cn("mt-0.5 size-4 shrink-0", typeConfig.className)}
-        />
-        <h4 className="text-sm font-medium leading-snug text-foreground line-clamp-2">
-          {task.title}
-        </h4>
+      {/* Priority badge */}
+      <span
+        className={cn(
+          "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+          priority.className
+        )}
+      >
+        {priority.label}
+      </span>
+
+      {/* Title */}
+      <h4 className="mt-2 text-sm font-semibold leading-snug text-foreground line-clamp-2">
+        {task.title}
+      </h4>
+
+      {/* Description preview */}
+      {task.description && (
+        <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+          Note: {task.description}
+        </p>
+      )}
+
+      {/* Progress bar */}
+      <div className="mt-3">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] text-muted-foreground font-medium">Progress</span>
+          <span className="text-[11px] text-muted-foreground font-medium">
+            {task.subtaskProgress}%
+          </span>
+        </div>
+        <div className="h-1.5 w-full rounded-full bg-muted/60">
+          <div
+            className="h-full rounded-full bg-teal-500 transition-all duration-300"
+            style={{ width: `${task.subtaskProgress}%` }}
+          />
+        </div>
       </div>
 
-      {/* Bottom row: priority pill, story points, assignee */}
+      {/* Bottom row: assignee avatar + counts */}
       <div className="mt-3 flex items-center gap-2">
-        {/* Priority pill */}
-        <span
-          className={cn(
-            "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium",
-            priority.className
-          )}
-        >
-          {priority.label}
-        </span>
-
-        {/* Story points */}
-        {task.storyPoints != null && task.storyPoints > 0 && (
-          <span className="inline-flex size-5 items-center justify-center rounded-full bg-violet-100 text-[10px] font-bold text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
-            {task.storyPoints}
-          </span>
-        )}
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
         {/* Assignee avatar */}
         {task.assignee && (
           <Avatar size="sm">
@@ -237,6 +210,21 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
             </AvatarFallback>
           </Avatar>
         )}
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Attachment count */}
+        <div className="flex items-center gap-0.5 text-muted-foreground">
+          <Paperclip className="size-3" />
+          <span className="text-[11px]">{task.attachmentCount}</span>
+        </div>
+
+        {/* Comment count */}
+        <div className="flex items-center gap-0.5 text-muted-foreground">
+          <MessageSquare className="size-3" />
+          <span className="text-[11px]">{task.commentCount}</span>
+        </div>
       </div>
     </div>
   );
