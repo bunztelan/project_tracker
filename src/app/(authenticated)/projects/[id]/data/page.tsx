@@ -19,7 +19,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 import { useProject } from "@/contexts/project-context";
+import { isFeatureEnabled } from "@/lib/feature-utils";
 import { ExcelUpload } from "@/components/data/excel-upload";
 import { DataPreviewTable } from "@/components/data/data-preview-table";
 import { ChartBuilder } from "@/components/data/chart-builder";
@@ -80,7 +82,15 @@ function formatDate(dateStr: string): string {
 /* -------------------------------------------------------------------------- */
 
 export default function DataPage() {
-  const { project } = useProject();
+  const { project, features } = useProject();
+  const router = useRouter();
+
+  // Feature gate — redirect if excel feature is disabled
+  useEffect(() => {
+    if (!isFeatureEnabled(features, "excel")) {
+      router.replace(`/projects/${project.id}/board`);
+    }
+  }, [features, project.id, router]);
 
   // State
   const [uploads, setUploads] = useState<UploadInfo[]>([]);

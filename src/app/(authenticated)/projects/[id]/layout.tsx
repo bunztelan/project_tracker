@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getProjectFeatures } from "@/lib/features";
 import { ProjectProvider } from "@/contexts/project-context";
+import { SyncFeatures } from "@/components/layout/sync-features";
 
 interface ProjectLayoutProps {
   children: React.ReactNode;
@@ -60,6 +61,7 @@ export default async function ProjectLayout({
         features,
       }}
     >
+      <SyncFeatures features={features} />
       {/* Project sub-header */}
       <div className="border-b bg-muted/30 px-6 py-3">
         <div className="flex items-center gap-3">

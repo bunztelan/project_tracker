@@ -51,6 +51,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FEATURE_DEPENDENCIES } from "@/lib/feature-utils";
+
+/** Client-side alias — mirrors FEATURE_DEPENDENCIES from the server. */
+const FEATURE_DEPS = FEATURE_DEPENDENCIES;
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -234,7 +238,18 @@ export function SettingsClient({
 
   const handleToggleFeature = useCallback(
     (key: string, enabled: boolean) => {
-      setFeatureStates((prev) => ({ ...prev, [key]: enabled }));
+      setFeatureStates((prev) => {
+        const next = { ...prev, [key]: enabled };
+        // Enforce dependencies: if disabling a feature, also disable dependents
+        if (!enabled) {
+          for (const [dependent, dependency] of Object.entries(FEATURE_DEPS)) {
+            if (dependency === key) {
+              next[dependent] = false;
+            }
+          }
+        }
+        return next;
+      });
     },
     []
   );
@@ -466,18 +481,23 @@ export function SettingsClient({
                 const enabled = featureStates[key] ?? false;
                 const Icon = def.icon;
 
+                // Check if this feature's dependency is disabled
+                const depKey = FEATURE_DEPS[key];
+                const depDisabled = depKey ? !(featureStates[depKey] ?? false) : false;
+                const depLabel = depKey ? FEATURE_DEFINITIONS[depKey]?.label : null;
+
                 return (
                   <div
                     key={key}
                     className={`relative flex items-start gap-4 rounded-xl border p-4 transition-all ${
-                      enabled
+                      enabled && !depDisabled
                         ? "border-violet-300 bg-violet-50/50 shadow-sm dark:border-violet-700 dark:bg-violet-950/30"
                         : "border-border bg-card hover:border-muted-foreground/20"
                     }`}
                   >
                     <div
                       className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${
-                        enabled
+                        enabled && !depDisabled
                           ? "bg-violet-100 text-violet-600 dark:bg-violet-900 dark:text-violet-300"
                           : "bg-muted text-muted-foreground"
                       }`}
@@ -488,17 +508,22 @@ export function SettingsClient({
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="text-sm font-medium">{def.label}</h3>
                         <Switch
-                          checked={enabled}
+                          checked={enabled && !depDisabled}
                           onCheckedChange={(checked) =>
                             handleToggleFeature(key, checked)
                           }
-                          disabled={!isAdminOrManager}
+                          disabled={!isAdminOrManager || depDisabled}
                           className="data-[state=checked]:bg-violet-600"
                         />
                       </div>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {def.description}
                       </p>
+                      {depDisabled && depLabel && (
+                        <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                          Requires {depLabel} to be enabled
+                        </p>
+                      )}
                     </div>
                   </div>
                 );

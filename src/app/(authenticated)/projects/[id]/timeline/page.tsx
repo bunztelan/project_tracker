@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getProjectFeatures, isFeatureEnabled } from "@/lib/features";
 import { TimelineClient } from "./timeline-client";
 
 /* -------------------------------------------------------------------------- */
@@ -31,6 +32,12 @@ export default async function TimelinePage({ params }: TimelinePageProps) {
   });
 
   if (!membership) {
+    notFound();
+  }
+
+  // Feature gate
+  const features = await getProjectFeatures(id);
+  if (!isFeatureEnabled(features, "timeline")) {
     notFound();
   }
 

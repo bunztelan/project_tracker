@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { featureStore } from "@/lib/feature-store";
 import {
   FolderKanban,
   LayoutDashboard,
@@ -65,7 +67,7 @@ const adminNavItem = {
 };
 
 const projectNavItems = [
-  { title: "Board", segment: "board", icon: Kanban, featureKey: "board" },
+  { title: "Board", segment: "board", icon: Kanban, featureKey: "kanban" },
   {
     title: "Backlog",
     segment: "backlog",
@@ -89,13 +91,13 @@ const projectNavItems = [
     title: "Data",
     segment: "data",
     icon: FileSpreadsheet,
-    featureKey: "data",
+    featureKey: "excel",
   },
   {
     title: "Settings",
     segment: "settings",
     icon: Settings,
-    featureKey: "settings",
+    featureKey: null,
   },
 ];
 
@@ -111,8 +113,16 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
 
   const isCollapsed = state === "collapsed";
 
-  // Prefer feature toggles from ProjectContext, fall back to prop, then undefined
-  const featureToggles = projectCtx?.features ?? featureTogglesProp;
+  // Subscribe to the global feature store (synced from ProjectProvider via SyncFeatures)
+  const [storeFeatures, setStoreFeatures] = useState<Record<string, boolean> | null>(
+    () => featureStore.get()
+  );
+  useEffect(() => {
+    return featureStore.subscribe(() => setStoreFeatures(featureStore.get()));
+  }, []);
+
+  // Prefer feature toggles from ProjectContext, then store, then prop, then undefined
+  const featureToggles = projectCtx?.features ?? storeFeatures ?? featureTogglesProp;
 
   // Detect if we're viewing a specific project: /projects/[projectId]/...
   const projectMatch = pathname.match(/^\/projects\/([^/]+)/);
@@ -133,6 +143,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
 
   // Filter project nav items based on feature toggles
   const visibleProjectNavItems = projectNavItems.filter((item) => {
+    if (!item.featureKey) return true; // Always show items without a feature key (e.g. Settings)
     if (!featureToggles) return true; // Show all if no toggles provided
     return featureToggles[item.featureKey] !== false; // Show unless explicitly disabled
   });
@@ -140,10 +151,10 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* App Header / Brand */}
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
+      <SidebarHeader className="h-14 flex-row items-center px-4 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-3 group/brand">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 shadow-md shadow-violet-500/25 transition-shadow group-hover/brand:shadow-lg group-hover/brand:shadow-violet-500/35">
-            <FolderKanban className="h-5 w-5 text-white" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 shadow-md shadow-violet-500/25 transition-shadow group-hover/brand:shadow-lg group-hover/brand:shadow-violet-500/35">
+            <FolderKanban className="h-4 w-4 text-white" />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
@@ -235,11 +246,25 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
           <>
             <div className="mx-4 border-t border-sidebar-border" />
             <SidebarGroup>
-              <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 truncate">
-                {projectCtx?.project
-                  ? `${projectCtx.project.key} — ${projectCtx.project.name}`
-                  : "Project"}
-              </SidebarGroupLabel>
+              {/* Project indicator */}
+              {!isCollapsed && projectCtx?.project && (
+                <Link
+                  href={`/projects/${projectId}/board`}
+                  className="mx-2 mb-1 flex items-center gap-2.5 rounded-lg bg-violet-50 px-3 py-2 transition-colors hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/15"
+                >
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-violet-600 to-indigo-600 text-[11px] font-bold text-white shadow-sm">
+                    {projectCtx.project.key.slice(0, 2)}
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="truncate text-sm font-semibold text-foreground">
+                      {projectCtx.project.name}
+                    </span>
+                    <span className="text-[10px] font-medium text-muted-foreground">
+                      {projectCtx.project.key}
+                    </span>
+                  </div>
+                </Link>
+              )}
               <SidebarGroupContent>
                 <SidebarMenu>
                   {visibleProjectNavItems.map((item) => {

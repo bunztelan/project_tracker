@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getProjectFeatures, isFeatureEnabled } from "@/lib/features";
 import { SprintBoard } from "@/components/sprints/sprint-board";
 
 /* -------------------------------------------------------------------------- */
@@ -31,6 +32,12 @@ export default async function SprintsPage({ params }: SprintsPageProps) {
   });
 
   if (!membership) {
+    notFound();
+  }
+
+  // Feature gate — sprints also requires backlog
+  const features = await getProjectFeatures(id);
+  if (!isFeatureEnabled(features, "sprints") || !isFeatureEnabled(features, "backlog")) {
     notFound();
   }
 
