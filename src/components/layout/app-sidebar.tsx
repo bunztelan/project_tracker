@@ -16,6 +16,7 @@ import {
   Settings,
   LogOut,
   ChevronsUpDown,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -57,6 +58,12 @@ const mainNavItems = [
     icon: FolderOpen,
   },
 ];
+
+const adminNavItem = {
+  title: "Admin",
+  href: "/admin",
+  icon: ShieldCheck,
+};
 
 const projectNavItems = [
   { title: "Board", segment: "board", icon: Kanban, featureKey: "board" },
@@ -193,6 +200,35 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
                   </SidebarMenuItem>
                 );
               })}
+              {/* Admin link — only visible to ADMIN users */}
+              {userRole === "ADMIN" && (() => {
+                const isActive = pathname.startsWith(adminNavItem.href);
+                return (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={adminNavItem.title}
+                      className={
+                        isActive
+                          ? "bg-gradient-to-r from-violet-500/15 to-indigo-500/10 text-violet-700 font-semibold hover:from-violet-500/20 hover:to-indigo-500/15 dark:from-violet-500/25 dark:to-indigo-500/20 dark:text-violet-300"
+                          : "text-muted-foreground hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-500/10 dark:hover:text-violet-300"
+                      }
+                    >
+                      <Link href={adminNavItem.href}>
+                        <adminNavItem.icon
+                          className={
+                            isActive
+                              ? "text-violet-600 dark:text-violet-400"
+                              : ""
+                          }
+                        />
+                        <span>{adminNavItem.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })()}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
