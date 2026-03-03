@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TaskType {
+  STORY
+  BUG
+  TASK
+  EPIC
+}
+
+enum SprintStatus {
+  PLANNING
+  ACTIVE
+  COMPLETED
+}
+
+enum WidgetType {
+  BAR
+  LINE
+  PIE
+  TABLE
+  KPI
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String
+  password       String
+  role           Role      @default(MEMBER)
+  avatar         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  ownedProjects  Project[]
+  assignedTasks  Task[]    @relation("TaskAssignee")
+  reportedTasks  Task[]    @relation("TaskReporter")
+  excelUploads   ExcelUpload[]
+  projectMembers ProjectMember[]
+}
+
+model Project {
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  key            String          @unique
+  status         String          @default("active")
+  ownerId        String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  owner          User            @relation(fields: [ownerId], references: [id])
+  boards         Board[]
+  tasks          Task[]
+  sprints        Sprint[]
+  featureToggles FeatureToggle[]
+  excelUploads   ExcelUpload[]
+  dashboards     Dashboard[]
+  members        ProjectMember[]
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  name      String
+  projectId String
+  createdAt DateTime @default(now())
+
+  project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  columns Column[]
+}
+
+model Column {
+  id       String @id @default(cuid())
+  name     String
+  position Int
+  boardId  String
+
+  board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks Task[]
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  status      String       @default("todo")
+  priority    TaskPriority @default(MEDIUM)
+  type        TaskType     @default(TASK)
+  storyPoints Int?
+  position    Int          @default(0)
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  projectId  String
+  columnId   String?
+  assigneeId String?
+  reporterId String?
+  sprintId   String?
+  parentId   String?
+
+  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  column   Column?  @relation(fields: [columnId], references: [id])
+  assignee User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  reporter User?    @relation("TaskReporter", fields: [reporterId], references: [id])
+  sprint   Sprint?  @relation(fields: [sprintId], references: [id])
+  parent   Task?    @relation("TaskSubtasks", fields: [parentId], references: [id])
+  subtasks Task[]   @relation("TaskSubtasks")
+}
+
+model Sprint {
+  id        String       @id @default(cuid())
+  name      String
+  goal      String?
+  startDate DateTime?
+  endDate   DateTime?
+  status    SprintStatus @default(PLANNING)
+  projectId String
+  createdAt DateTime     @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks   Task[]
+}
+
+model FeatureToggle {
+  id          String  @id @default(cuid())
+  featureKey  String
+  enabled     Boolean @default(false)
+  description String?
+  projectId   String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([featureKey, projectId])
+}
+
+model ExcelUpload {
+  id             String   @id @default(cuid())
+  fileName       String
+  fileSize       Int
+  parsedData     Json
+  columnMappings Json?
+  uploadedById   String
+  projectId      String
+  createdAt      DateTime @default(now())
+
+  uploadedBy User    @relation(fields: [uploadedById], references: [id])
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Dashboard {
+  id        String   @id @default(cuid())
+  name      String
+  projectId String
+  createdAt DateTime @default(now())
+
+  project Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  widgets DashboardWidget[]
+}
+
+model DashboardWidget {
+  id          String     @id @default(cuid())
+  type        WidgetType
+  config      Json
+  position    Int        @default(0)
+  size        String     @default("medium")
+  dashboardId String
+
+  dashboard Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+}
