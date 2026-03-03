@@ -29,7 +29,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 import {
@@ -141,7 +140,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* App Header / Brand */}
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-4 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-3 group/brand">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 shadow-md shadow-violet-500/25 transition-shadow group-hover/brand:shadow-lg group-hover/brand:shadow-violet-500/35">
             <FolderKanban className="h-5 w-5 text-white" />
@@ -159,9 +158,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
         </Link>
       </SidebarHeader>
 
-      <SidebarSeparator />
-
-      <SidebarContent>
+      <SidebarContent className="overflow-x-hidden">
         {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
@@ -236,10 +233,12 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
         {/* Project Sub-Navigation — only visible when viewing a project */}
         {projectId && visibleProjectNavItems.length > 0 && (
           <>
-            <SidebarSeparator />
+            <div className="mx-4 border-t border-sidebar-border" />
             <SidebarGroup>
-              <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-                Project
+              <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 truncate">
+                {projectCtx?.project
+                  ? `${projectCtx.project.key} — ${projectCtx.project.name}`
+                  : "Project"}
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -280,8 +279,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
       </SidebarContent>
 
       {/* User Menu at Bottom */}
-      <SidebarFooter>
-        <SidebarSeparator />
+      <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
