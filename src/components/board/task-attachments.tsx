@@ -264,20 +264,20 @@ export function TaskAttachments({ projectId, taskId }: TaskAttachmentsProps) {
                   {/* Thumbnail or icon */}
                   {isImage ? (
                     <a
-                      href={`/api/files/${att.filePath}`}
+                      href={att.filePath}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="shrink-0"
                     >
                       <img
-                        src={`/api/files/${att.filePath}`}
+                        src={att.filePath}
                         alt={att.fileName}
                         className="size-10 rounded object-cover"
                       />
                     </a>
                   ) : (
                     <a
-                      href={`/api/files/${att.filePath}`}
+                      href={att.filePath}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex size-10 shrink-0 items-center justify-center rounded bg-muted"

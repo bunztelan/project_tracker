@@ -278,13 +278,13 @@ export function TaskComments({ projectId, taskId }: TaskCommentsProps) {
                         return isImage ? (
                           <a
                             key={att.id}
-                            href={`/api/files/${att.filePath}`}
+                            href={att.filePath}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="block"
                           >
                             <img
-                              src={`/api/files/${att.filePath}`}
+                              src={att.filePath}
                               alt={att.fileName}
                               className="h-16 rounded-md object-cover border"
                             />
@@ -292,7 +292,7 @@ export function TaskComments({ projectId, taskId }: TaskCommentsProps) {
                         ) : (
                           <a
                             key={att.id}
-                            href={`/api/files/${att.filePath}`}
+                            href={att.filePath}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 transition-colors"
