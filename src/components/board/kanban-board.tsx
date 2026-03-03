@@ -302,6 +302,11 @@ export function KanbanBoard({
         assignee: null,
         reporter: null,
         subtaskCount: 0,
+        commentCount: 0,
+        attachmentCount: 0,
+        subtaskProgress: 0,
+        completedSubtasks: 0,
+        totalSubtasks: 0,
         parentId: null,
         sprintId: null,
       };

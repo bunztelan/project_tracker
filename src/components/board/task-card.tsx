@@ -38,6 +38,11 @@ export type BoardTask = {
   assignee: TaskAssignee | null;
   reporter: TaskAssignee | null;
   subtaskCount: number;
+  commentCount: number;
+  attachmentCount: number;
+  subtaskProgress: number;
+  completedSubtasks: number;
+  totalSubtasks: number;
   parentId: string | null;
   sprintId: string | null;
 };
