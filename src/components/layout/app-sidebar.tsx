@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useProjectOptional } from "@/contexts/project-context";
 
 /** Feature toggle keys for project sub-nav items */
 export type FeatureToggleMap = Record<string, boolean>;
@@ -96,12 +97,16 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   featureToggles?: FeatureToggleMap;
 }
 
-export function AppSidebar({ featureToggles, ...props }: AppSidebarProps) {
+export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: AppSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { state } = useSidebar();
+  const projectCtx = useProjectOptional();
 
   const isCollapsed = state === "collapsed";
+
+  // Prefer feature toggles from ProjectContext, fall back to prop, then undefined
+  const featureToggles = projectCtx?.features ?? featureTogglesProp;
 
   // Detect if we're viewing a specific project: /projects/[projectId]/...
   const projectMatch = pathname.match(/^\/projects\/([^/]+)/);
