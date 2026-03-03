@@ -6,51 +6,58 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
-import { Plus, Trash2 } from "lucide-react";
+import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { TaskCard, type BoardTask } from "./task-card";
 
 /* -------------------------------------------------------------------------- */
-/*  Column color palette (cycles through 4 vibrant colors)                    */
+/*  Column color palette (pastel backgrounds with colored dot headers)         */
 /* -------------------------------------------------------------------------- */
 
 const COLUMN_COLORS = [
   {
-    bar: "bg-blue-500",
-    badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
-    dropHighlight: "border-blue-400/60",
+    dot: "bg-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-950/20",
+    headerBg: "bg-amber-100/60 dark:bg-amber-900/30",
+    dropHighlight: "ring-2 ring-amber-300/60",
   },
   {
-    bar: "bg-amber-500",
-    badge:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
-    dropHighlight: "border-amber-400/60",
+    dot: "bg-orange-400",
+    bg: "bg-orange-50 dark:bg-orange-950/20",
+    headerBg: "bg-orange-100/60 dark:bg-orange-900/30",
+    dropHighlight: "ring-2 ring-orange-300/60",
   },
   {
-    bar: "bg-purple-500",
-    badge:
-      "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
-    dropHighlight: "border-purple-400/60",
+    dot: "bg-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-950/20",
+    headerBg: "bg-emerald-100/60 dark:bg-emerald-900/30",
+    dropHighlight: "ring-2 ring-emerald-300/60",
   },
   {
-    bar: "bg-emerald-500",
-    badge:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-    dropHighlight: "border-emerald-400/60",
+    dot: "bg-green-400",
+    bg: "bg-green-50 dark:bg-green-950/20",
+    headerBg: "bg-green-100/60 dark:bg-green-900/30",
+    dropHighlight: "ring-2 ring-green-300/60",
   },
   {
-    bar: "bg-rose-500",
-    badge:
-      "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300",
-    dropHighlight: "border-rose-400/60",
+    dot: "bg-rose-400",
+    bg: "bg-rose-50 dark:bg-rose-950/20",
+    headerBg: "bg-rose-100/60 dark:bg-rose-900/30",
+    dropHighlight: "ring-2 ring-rose-300/60",
   },
   {
-    bar: "bg-cyan-500",
-    badge:
-      "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300",
-    dropHighlight: "border-cyan-400/60",
+    dot: "bg-cyan-400",
+    bg: "bg-cyan-50 dark:bg-cyan-950/20",
+    headerBg: "bg-cyan-100/60 dark:bg-cyan-900/30",
+    dropHighlight: "ring-2 ring-cyan-300/60",
   },
 ];
 
@@ -153,13 +160,16 @@ export function KanbanColumn({
   const taskIds = tasks.map((t) => t.id);
 
   return (
-    <div className="flex w-[320px] shrink-0 flex-col">
-      {/* Color bar */}
-      <div className={cn("h-1.5 rounded-t-xl", colors.bar)} />
-
+    <div className={cn("flex w-[320px] shrink-0 flex-col rounded-xl", colors.bg)}>
       {/* Column header */}
-      <div className="group/header flex items-center justify-between rounded-b-none border-x border-t border-border/50 bg-muted/40 px-4 py-3">
+      <div className={cn(
+        "flex items-center justify-between rounded-t-xl px-4 py-3",
+        colors.headerBg
+      )}>
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          {/* Colored dot */}
+          <div className={cn("size-2 shrink-0 rounded-full", colors.dot)} />
+
           {isRenaming ? (
             <Input
               ref={renameInputRef}
@@ -172,58 +182,58 @@ export function KanbanColumn({
             />
           ) : (
             <h3
-              className="cursor-pointer truncate text-sm font-semibold text-foreground hover:text-primary transition-colors"
-              onClick={() => {
-                setRenameValue(columnName);
-                setIsRenaming(true);
-              }}
-              title="Click to rename"
+              className="truncate text-sm font-semibold text-foreground"
+              title={columnName}
             >
               {columnName}
             </h3>
           )}
-          <span
-            className={cn(
-              "inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
-              colors.badge
-            )}
-          >
-            {tasks.length}
-          </span>
         </div>
-        <div className="flex items-center gap-0.5">
-          {canDelete && onDelete && (
+
+        {/* "..." dropdown menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="icon-xs"
-              onClick={() => onDelete(columnId)}
-              className="opacity-0 group-hover/header:opacity-60 hover:!opacity-100 hover:text-destructive transition-opacity"
-              title="Delete column"
+              className="opacity-60 hover:opacity-100"
             >
-              <Trash2 className="size-3.5" />
+              <MoreHorizontal className="size-4" />
             </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            onClick={() => setIsAdding(!isAdding)}
-            className="opacity-60 hover:opacity-100"
-          >
-            <Plus className="size-3.5" />
-          </Button>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem
+              onClick={() => {
+                setRenameValue(columnName);
+                setIsRenaming(true);
+              }}
+            >
+              <Pencil className="mr-2 size-3.5" />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsAdding(true)}>
+              <Plus className="mr-2 size-3.5" />
+              Add task
+            </DropdownMenuItem>
+            {canDelete && onDelete && (
+              <DropdownMenuItem
+                onClick={() => onDelete(columnId)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 size-3.5" />
+                Delete column
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Droppable task area */}
       <div
         ref={setNodeRef}
         className={cn(
-          "flex min-h-[200px] flex-1 flex-col gap-3 rounded-b-xl border border-t-0 border-border/50 bg-muted/20 p-3 transition-all",
-          isOver && [
-            "border-dashed border-2",
-            colors.dropHighlight,
-            "bg-muted/40",
-          ]
+          "flex min-h-[200px] flex-1 flex-col gap-3 rounded-b-xl p-3 transition-all",
+          isOver && colors.dropHighlight
         )}
       >
         <SortableContext
