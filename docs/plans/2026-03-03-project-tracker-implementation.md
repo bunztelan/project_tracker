@@ -2,11 +2,20 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build a working Jira-like project management prototype with Excel data visualization for a banking client proposal.
+**Goal:** Build a working project management prototype with Excel data visualization for a banking client proposal.
 
 **Architecture:** Next.js 15 full-stack app (App Router + API Routes) with Prisma ORM and PostgreSQL. Single Docker container for self-hosted deployment.
 
 **Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui, Prisma, PostgreSQL, NextAuth.js, SheetJS, Recharts, @dnd-kit, Zod, Vitest, Playwright
+
+**UI Direction:** Monday.com-inspired — NOT Jira. The client explicitly dislikes Jira's cluttered, outdated, hard-to-navigate UI. Our design must be:
+- **Colorful & visual** — vibrant status colors, colored priority indicators, progress bars
+- **Spacious & clean** — generous whitespace, no dense tables, breathing room
+- **Friendly & approachable** — rounded corners (rounded-xl), soft shadows, smooth transitions (150-200ms)
+- **Minimal clicks** — inline editing, hover-to-reveal actions
+- **Avoid Jira anti-patterns** — no dense enterprise tables, no deep nested menus, no gray/corporate palette, no cluttered toolbars
+
+Color system: distinct vibrant colors per status column (blue, amber, purple, green), color-coded priority badges, colored task type icons, gradient progress bars.
 
 ---
 

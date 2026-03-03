@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-ProjectTracker — a Jira-like project management web app for a banking client proposal (5-15 users). Working prototype deliverable.
+ProjectTracker — a project management web app for a banking client proposal (5-15 users). Working prototype deliverable.
 
 ## Tech Stack
 
@@ -30,6 +30,15 @@ ProjectTracker — a Jira-like project management web app for a banking client p
 - Excel upload + flexible data visualization
 - Feature toggle system (per project)
 - Role-based access (Admin, Manager, Member)
+
+## UI Direction
+
+Monday.com-inspired — **NOT Jira**. Client explicitly dislikes Jira's UI. Follow these rules for ALL UI work:
+- Colorful & visual: vibrant status colors, colored priority badges, progress bars
+- Spacious & clean: generous whitespace, no dense tables
+- Friendly & approachable: rounded-xl corners, soft shadows, smooth transitions (150-200ms)
+- Minimal clicks: inline editing, hover-to-reveal actions
+- AVOID: dense enterprise tables, deep nested menus, gray/corporate palette, cluttered toolbars
 
 ## Architecture
 

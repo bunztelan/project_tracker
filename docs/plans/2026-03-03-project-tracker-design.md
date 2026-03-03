@@ -130,13 +130,52 @@ When OFF: nav item hidden, page returns 403.
 5. Widget saved to project dashboard
 6. Re-upload updates data, preserving chart config
 
+## UI Design Direction
+
+**Inspiration:** Monday.com — NOT Jira. The client explicitly dislikes Jira's UI (cluttered, outdated, hard to navigate).
+
+### Design Principles
+
+- **Colorful & visual** — vibrant status colors, colored priority indicators, progress bars with color
+- **Spacious & clean** — generous whitespace, no dense tables, breathing room between elements
+- **Friendly & approachable** — rounded corners, soft shadows, warm color palette, smooth transitions
+- **Minimal clicks** — inline editing where possible, hover-to-reveal actions, keyboard shortcuts
+- **Visual status indicators** — colored dots/pills for status, progress rings, color-coded columns
+
+### What to Avoid (Jira Anti-Patterns)
+
+- No dense enterprise-style tables with tiny text
+- No deep nested menus or settings panels
+- No overwhelming number of visible fields on task cards
+- No gray/corporate color scheme
+- No cluttered toolbars with dozens of icons
+
+### Color System
+
+- Status columns: each gets a distinct vibrant color (blue, amber, purple, green)
+- Priority: color-coded badges (gray=Low, blue=Medium, orange=High, red=Critical)
+- Task types: colored icons (green=Story, red=Bug, blue=Task, purple=Epic)
+- Progress: gradient progress bars
+- Generous use of accent colors throughout, not just gray-on-white
+
+### Component Style
+
+- Cards with rounded-xl corners and subtle shadows
+- Hover effects with smooth transitions (150-200ms)
+- Avatar groups for team members
+- Pill-shaped badges and tags
+- Colorful sidebar with active state highlighting
+- Empty states with illustrations or friendly messages
+
 ## Kanban Board
 
 - Customizable columns (default: To Do, In Progress, In Review, Done)
-- Drag-and-drop via @dnd-kit
-- Task cards: title, assignee avatar, priority badge, story points
-- Click-to-open task detail modal
-- Quick-add from any column
+- Each column has a distinct header color
+- Drag-and-drop via @dnd-kit with smooth animation
+- Task cards: title, colored priority pill, assignee avatar, story points — clean and minimal
+- Click-to-open task detail panel (slide-in, not a dense modal)
+- Quick-add task from any column with inline input
+- Column task count with colored badge
 
 ## Auth & Roles
 
