@@ -151,7 +151,7 @@ export function TaskDetailDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col !p-0 gap-0"
+        className="max-w-[95vw] md:max-w-3xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-hidden flex flex-col !p-0 gap-0"
         showCloseButton={true}
       >
         <DialogHeader className="sr-only">
@@ -206,7 +206,7 @@ export function TaskDetailDialog({
               </div>
 
               {/* Right column — metadata sidebar */}
-              <div className="w-56 shrink-0 border-l bg-muted/20 px-4 py-5 space-y-4 overflow-y-auto">
+              <div className="w-48 md:w-56 lg:w-64 shrink-0 border-l bg-muted/20 px-4 py-5 space-y-4 overflow-y-auto">
                 {/* Status */}
                 <div className="space-y-1.5">
                   <Label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">

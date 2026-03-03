@@ -359,10 +359,16 @@ export function TaskComments({ projectId, taskId }: TaskCommentsProps) {
 
         {/* Input row */}
         <div className="flex items-end gap-2">
-          <div className="flex-1 relative">
+          <div className="flex-1 rounded-lg border border-input shadow-xs focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 dark:bg-input/30">
             <textarea
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={(e) => {
+                setBody(e.target.value);
+                // Auto-resize
+                const el = e.target;
+                el.style.height = "auto";
+                el.style.height = `${el.scrollHeight}px`;
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   e.preventDefault();
@@ -370,27 +376,29 @@ export function TaskComments({ projectId, taskId }: TaskCommentsProps) {
                 }
               }}
               placeholder="Write a comment..."
-              rows={1}
-              className="w-full rounded-lg border border-input bg-transparent px-3 py-2 pr-10 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30 resize-none min-h-[36px] max-h-[120px]"
+              rows={3}
+              className="w-full bg-transparent px-3 pt-2.5 pb-1 text-sm outline-none placeholder:text-muted-foreground resize-none min-h-[72px] max-h-[200px]"
             />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute right-2 bottom-2 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-            >
-              <Paperclip className="size-3.5" />
-            </button>
+            <div className="flex items-center justify-end px-2 pb-1.5">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors rounded"
+              >
+                <Paperclip className="size-3.5" />
+              </button>
+            </div>
           </div>
           <Button
             size="sm"
             onClick={handleSubmit}
             disabled={submitting || (!body.trim() && selectedFiles.length === 0)}
-            className="shrink-0 h-9"
+            className="shrink-0 size-9 p-0 rounded-lg"
           >
             {submitting ? (
-              <Loader2 className="size-3.5 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
-              <Send className="size-3.5" />
+              <Send className="size-4" />
             )}
           </Button>
         </div>
