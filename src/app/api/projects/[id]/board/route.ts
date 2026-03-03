@@ -78,7 +78,14 @@ export async function GET(
                   },
                 },
                 _count: {
-                  select: { subtasks: true },
+                  select: {
+                    subtasks: true,
+                    comments: true,
+                    attachments: true,
+                  },
+                },
+                subtasks: {
+                  select: { status: true },
                 },
               },
             },
@@ -119,6 +126,17 @@ export async function GET(
           assignee: task.assignee,
           reporter: task.reporter,
           subtaskCount: task._count.subtasks,
+          commentCount: task._count.comments,
+          attachmentCount: task._count.attachments,
+          totalSubtasks: task._count.subtasks,
+          completedSubtasks: task.subtasks.filter((s: { status: string }) => s.status === "done").length,
+          subtaskProgress: task._count.subtasks > 0
+            ? Math.round(
+                (task.subtasks.filter((s: { status: string }) => s.status === "done").length /
+                  task._count.subtasks) *
+                  100
+              )
+            : 0,
           parentId: task.parentId,
           sprintId: task.sprintId,
         })),
