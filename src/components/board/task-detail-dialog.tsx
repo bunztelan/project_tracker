@@ -36,6 +36,8 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import type { BoardTask, BoardColumn } from "./task-card";
+import { TaskAttachments } from "./task-attachments";
+import { TaskComments } from "./task-comments";
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -196,11 +198,11 @@ export function TaskDetailDialog({
                   />
                 </div>
 
-                {/* Attachments placeholder — wired in Task 6 */}
-                {/* <TaskAttachments projectId={projectId} taskId={task.id} /> */}
+                {/* Attachments */}
+                <TaskAttachments projectId={projectId} taskId={task.id} />
 
-                {/* Comments placeholder — wired in Task 7 */}
-                {/* <TaskComments projectId={projectId} taskId={task.id} /> */}
+                {/* Comments */}
+                <TaskComments projectId={projectId} taskId={task.id} />
               </div>
 
               {/* Right column — metadata sidebar */}
