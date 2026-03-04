@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { TaskPriority, TaskType } from "@/generated/prisma/client";
 import { z } from "zod";
 import { getSessionAndMembership } from "@/lib/api-utils";
-import { statusFromColumnName } from "@/lib/task-constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -236,15 +235,15 @@ export async function POST(
       position = lastTask ? lastTask.position + 1 : 0;
     }
 
-    // Determine status from column name if column exists
+    // Determine status from column's statusKey
     let status = "todo";
     if (resolvedColumnId) {
       const column = await prisma.column.findUnique({
         where: { id: resolvedColumnId },
-        select: { name: true },
+        select: { statusKey: true },
       });
       if (column) {
-        status = statusFromColumnName(column.name);
+        status = column.statusKey;
       }
     }
 

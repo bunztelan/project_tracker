@@ -137,6 +137,7 @@ export async function PATCH(
           name: data.name,
           position: nextPosition,
           boardId: board.id,
+          statusKey: "todo",
         },
       });
 

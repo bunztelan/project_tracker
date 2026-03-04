@@ -133,10 +133,10 @@ async function main() {
   }
 
   const columnDefs = [
-    { name: "To Do", position: 0 },
-    { name: "In Progress", position: 1 },
-    { name: "In Review", position: 2 },
-    { name: "Done", position: 3 },
+    { name: "To Do", position: 0, statusKey: "todo" },
+    { name: "In Progress", position: 1, statusKey: "in_progress" },
+    { name: "In Review", position: 2, statusKey: "in_review" },
+    { name: "Done", position: 3, statusKey: "done" },
   ];
 
   const columns: Record<string, { id: string; name: string; position: number; boardId: string }> = {};
@@ -151,6 +151,7 @@ async function main() {
         data: {
           name: col.name,
           position: col.position,
+          statusKey: col.statusKey,
           boardId: board.id,
         },
       });

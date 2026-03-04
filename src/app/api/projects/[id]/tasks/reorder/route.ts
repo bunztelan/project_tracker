@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { getSessionAndMembership } from "@/lib/api-utils";
-import { statusFromColumnName } from "@/lib/task-constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -89,8 +88,8 @@ export async function POST(
     const sourceColumnId = task.columnId;
     const isMovingColumns = sourceColumnId !== columnId;
 
-    // Determine status from column name
-    const status = statusFromColumnName(column.name);
+    // Determine status from column's statusKey
+    const status = column.statusKey;
 
     await prisma.$transaction(async (tx) => {
       if (isMovingColumns) {

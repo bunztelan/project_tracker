@@ -101,13 +101,16 @@ model Board {
 
   project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   columns Column[]
+
+  @@index([projectId])
 }
 
 model Column {
-  id       String @id @default(cuid())
-  name     String
-  position Int
-  boardId  String
+  id        String @id @default(cuid())
+  name      String
+  position  Int
+  statusKey String @default("todo")
+  boardId   String
 
   board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   tasks Task[]
@@ -142,6 +145,9 @@ model Task {
   subtasks Task[]   @relation("TaskSubtasks")
   comments    Comment[]
   attachments Attachment[]
+
+  @@index([projectId, status])
+  @@index([columnId, position])
 }
 
 model Sprint {
