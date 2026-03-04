@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronsUpDown,
   ShieldCheck,
+  Building2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -106,6 +107,20 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
 
   const isCollapsed = state === "collapsed";
 
+  // Fetch user's organizations
+  const [organizations, setOrganizations] = useState<
+    Array<{ id: string; name: string; slug: string; plan: string; role: string }>
+  >([]);
+
+  useEffect(() => {
+    fetch("/api/organizations")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.data) setOrganizations(data.data);
+      })
+      .catch(() => {});
+  }, []);
+
   // Subscribe to the global feature store (synced from ProjectProvider via SyncFeatures)
   const [storeFeatures, setStoreFeatures] = useState<Record<string, boolean> | null>(
     () => featureStore.get()
@@ -164,6 +179,15 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
             </div>
           )}
         </Link>
+        {/* Organization indicator */}
+        {!isCollapsed && organizations.length > 0 && (
+          <div className="mt-1 flex items-center gap-1.5 px-1">
+            <Building2 className="h-3 w-3 text-muted-foreground" />
+            <span className="text-[10px] font-medium text-muted-foreground truncate">
+              {organizations.find(o => o.id === session?.user?.activeOrganizationId)?.name ?? organizations[0]?.name}
+            </span>
+          </div>
+        )}
       </SidebarHeader>
 
       <SidebarContent className="overflow-x-hidden">
