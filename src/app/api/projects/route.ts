@@ -37,9 +37,14 @@ export async function GET() {
     });
     const projectIds = memberships.map((m) => m.projectId);
 
-    // Fetch projects with member count & task count
+    // Fetch projects with member count & task count (scoped by active org)
     const projects = await prisma.project.findMany({
-      where: { id: { in: projectIds } },
+      where: {
+        id: { in: projectIds },
+        ...(session.user.activeOrganizationId
+          ? { organizationId: session.user.activeOrganizationId }
+          : {}),
+      },
       orderBy: { updatedAt: "desc" },
       include: {
         _count: {
@@ -89,6 +94,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { data: null, error: "Unauthorized", message: "You must be signed in." },
         { status: 401 }
+      );
+    }
+
+    // Require active organization
+    if (!session.user.activeOrganizationId) {
+      return NextResponse.json(
+        { data: null, error: "no_organization", message: "No active organization" },
+        { status: 400 }
       );
     }
 
@@ -142,6 +155,7 @@ export async function POST(request: NextRequest) {
           description,
           key,
           ownerId: session.user.id,
+          organizationId: session.user.activeOrganizationId!,
         },
       });
 
