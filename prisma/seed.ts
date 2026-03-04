@@ -49,6 +49,42 @@ async function main() {
 
   console.log("  Created users:", admin.email, manager.email, member.email);
 
+  // ── 1b. Default Organization ─────────────────────────────────────
+  const defaultOrg = await prisma.organization.upsert({
+    where: { slug: "demo-org" },
+    update: {},
+    create: {
+      name: "Demo Organization",
+      slug: "demo-org",
+      plan: "PRO",
+    },
+  });
+
+  console.log("  Created organization:", defaultOrg.name);
+
+  // ── 1c. Organization Members ─────────────────────────────────────
+  const orgMembers = [
+    { userId: admin.id, role: "OWNER" as const },
+    { userId: manager.id, role: "ADMIN" as const },
+    { userId: member.id, role: "MEMBER" as const },
+  ];
+
+  for (const om of orgMembers) {
+    await prisma.organizationMember.upsert({
+      where: {
+        userId_organizationId: { userId: om.userId, organizationId: defaultOrg.id },
+      },
+      update: {},
+      create: {
+        userId: om.userId,
+        organizationId: defaultOrg.id,
+        role: om.role,
+      },
+    });
+  }
+
+  console.log("  Added organization members");
+
   // ── 2. Demo Project ──────────────────────────────────────────────
   const project = await prisma.project.upsert({
     where: { key: "DEMO" },
@@ -58,6 +94,7 @@ async function main() {
       description: "A demo project to explore ProjectTracker features",
       key: "DEMO",
       ownerId: admin.id,
+      organizationId: defaultOrg.id,
     },
   });
 
