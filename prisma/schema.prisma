@@ -126,6 +126,7 @@ model Task {
   storyPoints Int?
   position    Int          @default(0)
   dueDate     DateTime?
+  startDate   DateTime?    @default(now())
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
