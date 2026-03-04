@@ -35,6 +35,7 @@ export type TimelineTask = {
   type: "STORY" | "BUG" | "TASK" | "EPIC";
   storyPoints: number | null;
   dueDate: string | null;
+  startDate: string | null;
   createdAt: string;
   assignee: {
     id: string;
@@ -147,7 +148,7 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
 
     const dates: Date[] = [];
     for (const task of tasks) {
-      dates.push(new Date(task.createdAt));
+      dates.push(new Date(task.startDate || task.createdAt));
       if (task.dueDate) dates.push(new Date(task.dueDate));
     }
     dates.push(now);
@@ -286,7 +287,7 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
   // ---- Task bar positioning ----
   const getBarStyle = useCallback(
     (task: TimelineTask) => {
-      const startDate = startOfDay(new Date(task.createdAt));
+      const startDate = startOfDay(new Date(task.startDate || task.createdAt));
       const endDate = task.dueDate ? startOfDay(new Date(task.dueDate)) : startDate;
       const startOffset = differenceInDays(startDate, timelineStart);
       const duration = Math.max(differenceInDays(endDate, startDate), 0) + 1;
@@ -569,7 +570,7 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
                           <p className="font-medium text-xs">{task.title}</p>
                           <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
                             <span>
-                              {format(new Date(task.createdAt), "MMM d")}
+                              {format(new Date(task.startDate || task.createdAt), "MMM d")}
                               {task.dueDate
                                 ? ` - ${format(new Date(task.dueDate), "MMM d, yyyy")}`
                                 : " (no due date)"}

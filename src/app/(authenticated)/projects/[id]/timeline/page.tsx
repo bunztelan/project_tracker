@@ -91,6 +91,7 @@ export default async function TimelinePage({ params }: TimelinePageProps) {
     priority: task.priority,
     type: task.type,
     storyPoints: task.storyPoints,
+    startDate: task.startDate ? task.startDate.toISOString() : null,
     dueDate: task.dueDate ? task.dueDate.toISOString() : null,
     createdAt: task.createdAt.toISOString(),
     assignee: task.assignee,
@@ -132,8 +133,7 @@ export default async function TimelinePage({ params }: TimelinePageProps) {
               <h3 className="text-lg font-semibold">No tasks yet</h3>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
                 Create tasks on the Board or Backlog to see them plotted on the
-                timeline. Tasks use their creation date as the start and due
-                date as the end.
+                timeline. Tasks use their start date and due date to form bars.
               </p>
             </div>
           </div>
