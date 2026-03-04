@@ -73,25 +73,31 @@ const statusDot: Record<string, string> = {
 /*  Data fetching                                                             */
 /* -------------------------------------------------------------------------- */
 
-async function getDashboardData(userId: string) {
+async function getDashboardData(userId: string, organizationId: string | null) {
   const memberships = await prisma.projectMember.findMany({
     where: { userId },
     select: { projectId: true },
   });
   const projectIds = memberships.map((m) => m.projectId);
 
-  const [totalProjects, totalTasks, tasksInProgress, tasksCompleted, recentProjectsRaw] =
+  // Scope by organization if active
+  const projectWhere = {
+    id: { in: projectIds },
+    ...(organizationId ? { organizationId } : {}),
+  };
+
+  const [totalProjects, totalTasks, tasksInProgress, tasksCompleted, recentProjectsRaw, organization] =
     await Promise.all([
-      prisma.project.count({ where: { id: { in: projectIds } } }),
-      prisma.task.count({ where: { projectId: { in: projectIds } } }),
+      prisma.project.count({ where: projectWhere }),
+      prisma.task.count({ where: { project: projectWhere } }),
       prisma.task.count({
-        where: { projectId: { in: projectIds }, status: "in_progress" },
+        where: { project: projectWhere, status: "in_progress" },
       }),
       prisma.task.count({
-        where: { projectId: { in: projectIds }, status: "done" },
+        where: { project: projectWhere, status: "done" },
       }),
       prisma.project.findMany({
-        where: { id: { in: projectIds } },
+        where: projectWhere,
         orderBy: { updatedAt: "desc" },
         take: 5,
         include: {
@@ -99,6 +105,12 @@ async function getDashboardData(userId: string) {
           tasks: { where: { status: "done" }, select: { id: true } },
         },
       }),
+      organizationId
+        ? prisma.organization.findUnique({
+            where: { id: organizationId },
+            select: { name: true },
+          })
+        : Promise.resolve(null),
     ]);
 
   const recentProjects: RecentProject[] = recentProjectsRaw.map((p) => ({
@@ -112,7 +124,7 @@ async function getDashboardData(userId: string) {
     tasksDone: p.tasks.length,
   }));
 
-  return { totalProjects, totalTasks, tasksInProgress, tasksCompleted, recentProjects };
+  return { totalProjects, totalTasks, tasksInProgress, tasksCompleted, recentProjects, organizationName: organization?.name ?? null };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -251,7 +263,7 @@ export default async function DashboardPage() {
   let fetchError = false;
 
   try {
-    dashboardData = await getDashboardData(session.user.id);
+    dashboardData = await getDashboardData(session.user.id, session.user.activeOrganizationId ?? null);
   } catch {
     fetchError = true;
   }
@@ -271,14 +283,21 @@ export default async function DashboardPage() {
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
           {greeting}, {firstName}
         </h1>
-        {dashboardData && dashboardData.totalTasks > 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {dashboardData.tasksInProgress} task
-            {dashboardData.tasksInProgress !== 1 ? "s" : ""} in progress
-            {" \u00b7 "}
-            {dashboardData.tasksCompleted} completed
-          </p>
-        )}
+        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+          {dashboardData?.organizationName && (
+            <Badge variant="outline" className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-800 dark:bg-brand-500/10 dark:text-brand-300">
+              {dashboardData.organizationName}
+            </Badge>
+          )}
+          {dashboardData && dashboardData.totalTasks > 0 && (
+            <span>
+              {dashboardData.tasksInProgress} task
+              {dashboardData.tasksInProgress !== 1 ? "s" : ""} in progress
+              {" \u00b7 "}
+              {dashboardData.tasksCompleted} completed
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ── DB error notice ──────────────────────────────────── */}

@@ -159,7 +159,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* App Header / Brand */}
-      <SidebarHeader className="h-14 flex-row items-center px-4 border-b border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-3">
         <Link href="/dashboard" className="flex items-center gap-3 group/brand">
           <Image
             src="/logo.png"
@@ -169,25 +169,25 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
             className="shrink-0"
           />
           {!isCollapsed && (
-            <div className="flex flex-col">
+            <div className="flex flex-col overflow-hidden">
               <span className="text-sm font-bold tracking-tight text-foreground">
                 Planowiz
               </span>
-              <span className="text-[10px] font-medium text-muted-foreground">
-                Manage with clarity
-              </span>
+              {organizations.length > 0 ? (
+                <div className="flex items-center gap-1">
+                  <Building2 className="h-3 w-3 shrink-0 text-brand-500" />
+                  <span className="truncate text-[11px] font-medium text-brand-600 dark:text-brand-400">
+                    {organizations.find(o => o.id === session?.user?.activeOrganizationId)?.name ?? organizations[0]?.name}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-[10px] font-medium text-muted-foreground">
+                  Manage with clarity
+                </span>
+              )}
             </div>
           )}
         </Link>
-        {/* Organization indicator */}
-        {!isCollapsed && organizations.length > 0 && (
-          <div className="mt-1 flex items-center gap-1.5 px-1">
-            <Building2 className="h-3 w-3 text-muted-foreground" />
-            <span className="text-[10px] font-medium text-muted-foreground truncate">
-              {organizations.find(o => o.id === session?.user?.activeOrganizationId)?.name ?? organizations[0]?.name}
-            </span>
-          </div>
-        )}
       </SidebarHeader>
 
       <SidebarContent className="overflow-x-hidden">

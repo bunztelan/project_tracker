@@ -55,7 +55,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
       }
-      // Refresh role from DB on each request
+
+      // Refresh role + org context from DB
       if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
@@ -64,13 +65,54 @@ export const authOptions: NextAuthOptions = {
         if (dbUser) {
           token.role = dbUser.role;
         }
+
+        // If no active org set yet, pick the user's first org
+        if (!token.activeOrganizationId) {
+          const firstOrgMembership = await prisma.organizationMember.findFirst({
+            where: { userId: token.id as string },
+            include: { organization: { select: { id: true, plan: true } } },
+            orderBy: { joinedAt: "asc" },
+          });
+          if (firstOrgMembership) {
+            token.activeOrganizationId = firstOrgMembership.organizationId;
+            token.organizationRole = firstOrgMembership.role;
+            token.organizationPlan = firstOrgMembership.organization.plan;
+          } else {
+            token.activeOrganizationId = null;
+            token.organizationRole = null;
+            token.organizationPlan = null;
+          }
+        } else {
+          // Refresh org role and plan
+          const orgMembership = await prisma.organizationMember.findUnique({
+            where: {
+              userId_organizationId: {
+                userId: token.id as string,
+                organizationId: token.activeOrganizationId,
+              },
+            },
+            include: { organization: { select: { plan: true } } },
+          });
+          if (orgMembership) {
+            token.organizationRole = orgMembership.role;
+            token.organizationPlan = orgMembership.organization.plan;
+          } else {
+            token.activeOrganizationId = null;
+            token.organizationRole = null;
+            token.organizationPlan = null;
+          }
+        }
       }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.activeOrganizationId = token.activeOrganizationId;
+        session.user.organizationRole = token.organizationRole;
+        session.user.organizationPlan = token.organizationPlan;
       }
       return session;
     },
