@@ -1,30 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-async function getSessionAndMembership(projectId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, membership: null };
-  }
-
-  const membership = await prisma.projectMember.findUnique({
-    where: {
-      userId_projectId: {
-        userId: session.user.id,
-        projectId,
-      },
-    },
-  });
-
-  return { session, membership };
-}
+import { getSessionAndMembership } from "@/lib/api-utils";
+import { MAX_COLUMNS, MIN_COLUMNS } from "@/lib/task-constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation schemas                                                        */
@@ -143,9 +121,9 @@ export async function PATCH(
     /*  ADD                                                                   */
     /* ---------------------------------------------------------------------- */
     if (data.action === "add") {
-      if (board.columns.length >= 6) {
+      if (board.columns.length >= MAX_COLUMNS) {
         return NextResponse.json(
-          { data: null, error: "Limit reached", message: "Maximum of 6 columns allowed." },
+          { data: null, error: "Limit reached", message: `Maximum of ${MAX_COLUMNS} columns allowed.` },
           { status: 400 }
         );
       }
@@ -159,6 +137,7 @@ export async function PATCH(
           name: data.name,
           position: nextPosition,
           boardId: board.id,
+          statusKey: "todo",
         },
       });
 
@@ -173,9 +152,9 @@ export async function PATCH(
     /*  DELETE                                                                */
     /* ---------------------------------------------------------------------- */
     if (data.action === "delete") {
-      if (board.columns.length <= 4) {
+      if (board.columns.length <= MIN_COLUMNS) {
         return NextResponse.json(
-          { data: null, error: "Limit reached", message: "Minimum of 4 columns required." },
+          { data: null, error: "Limit reached", message: `Minimum of ${MIN_COLUMNS} columns required.` },
           { status: 400 }
         );
       }

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
 import { z } from "zod";
+import { getSessionAndMembership } from "@/lib/api-utils";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -13,28 +12,6 @@ const addMemberSchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["ADMIN", "MANAGER", "MEMBER"]).optional().default("MEMBER"),
 });
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-async function getSessionAndMembership(projectId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, membership: null };
-  }
-
-  const membership = await prisma.projectMember.findUnique({
-    where: {
-      userId_projectId: {
-        userId: session.user.id,
-        projectId,
-      },
-    },
-  });
-
-  return { session, membership };
-}
 
 /* -------------------------------------------------------------------------- */
 /*  GET /api/projects/[id]/members — list members with user details           */

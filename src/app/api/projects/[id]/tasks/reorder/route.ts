@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getSessionAndMembership } from "@/lib/api-utils";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -13,28 +12,6 @@ const reorderSchema = z.object({
   columnId: z.string().min(1),
   position: z.number().int().min(0),
 });
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-async function getSessionAndMembership(projectId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, membership: null };
-  }
-
-  const membership = await prisma.projectMember.findUnique({
-    where: {
-      userId_projectId: {
-        userId: session.user.id,
-        projectId,
-      },
-    },
-  });
-
-  return { session, membership };
-}
 
 /* -------------------------------------------------------------------------- */
 /*  POST /api/projects/[id]/tasks/reorder — drag-and-drop reordering          */
@@ -111,16 +88,8 @@ export async function POST(
     const sourceColumnId = task.columnId;
     const isMovingColumns = sourceColumnId !== columnId;
 
-    // Determine status from column name
-    const colNameLower = column.name.toLowerCase();
-    let status = "todo";
-    if (colNameLower.includes("progress")) {
-      status = "in_progress";
-    } else if (colNameLower.includes("review")) {
-      status = "in_review";
-    } else if (colNameLower.includes("done")) {
-      status = "done";
-    }
+    // Determine status from column's statusKey
+    const status = column.statusKey;
 
     await prisma.$transaction(async (tx) => {
       if (isMovingColumns) {

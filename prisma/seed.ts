@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient, Role, TaskPriority, TaskType } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
@@ -132,10 +133,10 @@ async function main() {
   }
 
   const columnDefs = [
-    { name: "To Do", position: 0 },
-    { name: "In Progress", position: 1 },
-    { name: "In Review", position: 2 },
-    { name: "Done", position: 3 },
+    { name: "To Do", position: 0, statusKey: "todo" },
+    { name: "In Progress", position: 1, statusKey: "in_progress" },
+    { name: "In Review", position: 2, statusKey: "in_review" },
+    { name: "Done", position: 3, statusKey: "done" },
   ];
 
   const columns: Record<string, { id: string; name: string; position: number; boardId: string }> = {};
@@ -150,6 +151,7 @@ async function main() {
         data: {
           name: col.name,
           position: col.position,
+          statusKey: col.statusKey,
           boardId: board.id,
         },
       });
@@ -189,7 +191,7 @@ async function main() {
     {
       title: "Implement user authentication",
       description: "Build login, registration, and session management with NextAuth.js",
-      status: "in-review",
+      status: "in_review",
       priority: TaskPriority.HIGH,
       type: TaskType.STORY,
       storyPoints: 5,
@@ -201,7 +203,7 @@ async function main() {
     {
       title: "Build dashboard widgets",
       description: "Create reusable chart and KPI widgets for the project dashboard",
-      status: "in-progress",
+      status: "in_progress",
       priority: TaskPriority.MEDIUM,
       type: TaskType.TASK,
       storyPoints: 5,

@@ -1,31 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import type { WidgetType } from "@/generated/prisma/enums";
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                    */
-/* -------------------------------------------------------------------------- */
-
-async function getSessionAndMembership(projectId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, membership: null };
-  }
-
-  const membership = await prisma.projectMember.findUnique({
-    where: {
-      userId_projectId: {
-        userId: session.user.id,
-        projectId,
-      },
-    },
-  });
-
-  return { session, membership };
-}
+import { getSessionAndMembership } from "@/lib/api-utils";
 
 const VALID_WIDGET_TYPES: WidgetType[] = ["BAR", "LINE", "PIE", "TABLE", "KPI"];
 

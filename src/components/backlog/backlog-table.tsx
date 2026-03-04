@@ -1,22 +1,13 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 import { format } from "date-fns";
 import {
-  CheckCircle2,
-  Circle,
-  Square,
-  Diamond,
-  Search,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
   ChevronLeft,
   ChevronRight,
-  Plus,
-  ListFilter,
-  X,
 } from "lucide-react";
 import {
   Table,
@@ -28,18 +19,14 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { TaskDetailDialog } from "@/components/board/task-detail-dialog";
+import { TaskDetailDialog } from "@/components/shared/task-detail-dialog";
 import { CreateTaskDialog } from "@/components/board/create-task-dialog";
 import { cn } from "@/lib/utils";
+import { PRIORITY_CONFIG, TYPE_CONFIG, STATUS_CONFIG } from "@/lib/task-constants";
+import { useBacklogData } from "@/hooks/use-backlog-data";
+import { BacklogFilters } from "@/components/backlog/backlog-filters";
 import type { BoardTask, BoardColumn } from "@/components/board/task-card";
+import type { SortField, SortDirection } from "@/hooks/use-backlog-data";
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -65,92 +52,6 @@ interface BacklogTableProps {
   };
 }
 
-type SortField =
-  | "title"
-  | "type"
-  | "priority"
-  | "assignee"
-  | "storyPoints"
-  | "status"
-  | "dueDate";
-
-type SortDirection = "asc" | "desc";
-
-/* -------------------------------------------------------------------------- */
-/*  Priority config                                                           */
-/* -------------------------------------------------------------------------- */
-
-const PRIORITY_CONFIG: Record<
-  BoardTask["priority"],
-  { label: string; className: string; order: number }
-> = {
-  CRITICAL: {
-    label: "Critical",
-    className:
-      "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
-    order: 4,
-  },
-  HIGH: {
-    label: "High",
-    className:
-      "bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
-    order: 3,
-  },
-  MEDIUM: {
-    label: "Medium",
-    className:
-      "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
-    order: 2,
-  },
-  LOW: {
-    label: "Low",
-    className:
-      "bg-gray-50 text-gray-600 border border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-700",
-    order: 1,
-  },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Type config                                                               */
-/* -------------------------------------------------------------------------- */
-
-const TYPE_CONFIG: Record<
-  BoardTask["type"],
-  { icon: typeof CheckCircle2; className: string; label: string }
-> = {
-  STORY: { icon: CheckCircle2, className: "text-emerald-500", label: "Story" },
-  BUG: { icon: Circle, className: "text-red-500", label: "Bug" },
-  TASK: { icon: Square, className: "text-blue-500", label: "Task" },
-  EPIC: { icon: Diamond, className: "text-purple-500", label: "Epic" },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Status config                                                             */
-/* -------------------------------------------------------------------------- */
-
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  todo: {
-    label: "To Do",
-    className:
-      "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  },
-  in_progress: {
-    label: "In Progress",
-    className:
-      "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
-  },
-  in_review: {
-    label: "In Review",
-    className:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
-  },
-  done: {
-    label: "Done",
-    className:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-  },
-};
-
 /* -------------------------------------------------------------------------- */
 /*  Helper: initials from name                                                */
 /* -------------------------------------------------------------------------- */
@@ -165,6 +66,50 @@ function getInitials(name: string): string {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  SortableHeader (module-level component)                                   */
+/* -------------------------------------------------------------------------- */
+
+function SortableHeader({
+  field,
+  sortField,
+  sortDirection,
+  onSort,
+  children,
+  className,
+}: {
+  field: SortField;
+  sortField: SortField;
+  sortDirection: SortDirection;
+  onSort: (field: SortField) => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const isActive = sortField === field;
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(field)}
+      className={cn(
+        "inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors",
+        isActive && "text-foreground",
+        className
+      )}
+    >
+      {children}
+      {isActive ? (
+        sortDirection === "asc" ? (
+          <ArrowUp className="size-3.5" />
+        ) : (
+          <ArrowDown className="size-3.5" />
+        )
+      ) : (
+        <ArrowUpDown className="size-3.5 opacity-40" />
+      )}
+    </button>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Component                                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -175,447 +120,59 @@ export function BacklogTable({
   columns,
   pagination: initialPagination,
 }: BacklogTableProps) {
-  const router = useRouter();
-
-  // -- State --
-  const [tasks, setTasks] = useState<BoardTask[]>(initialTasks);
-  const [pagination, setPagination] = useState(initialPagination);
-  const [search, setSearch] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [assigneeFilter, setAssigneeFilter] = useState<string>("all");
-  const [sortField, setSortField] = useState<SortField>("title");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [loading, setLoading] = useState(false);
-
-  // -- Detail dialog --
-  const [selectedTask, setSelectedTask] = useState<BoardTask | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
-
-  // -- Create dialog --
-  const [createOpen, setCreateOpen] = useState(false);
-
-  /* -------------------------------------------------------------------------- */
-  /*  Fetch tasks from API                                                      */
-  /* -------------------------------------------------------------------------- */
-
-  const fetchTasks = useCallback(
-    async (
-      page: number,
-      searchTerm?: string,
-      priority?: string,
-      type?: string,
-      assignee?: string
-    ) => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        params.set("page", String(page));
-        params.set("limit", "20");
-
-        if (searchTerm) params.set("search", searchTerm);
-        if (priority && priority !== "all") params.set("priority", priority);
-        if (type && type !== "all") params.set("type", type);
-        if (assignee && assignee !== "all") params.set("assignee", assignee);
-
-        const res = await fetch(
-          `/api/projects/${projectId}/tasks?${params.toString()}`
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch tasks");
-
-        const json = await res.json();
-        if (json.data) {
-          // Shape into BoardTask format
-          const shaped: BoardTask[] = json.data.tasks.map(
-            (t: Record<string, unknown>) => ({
-              id: t.id as string,
-              title: t.title as string,
-              description: t.description as string | null,
-              status: t.status as string,
-              priority: t.priority as BoardTask["priority"],
-              type: t.type as BoardTask["type"],
-              storyPoints: t.storyPoints as number | null,
-              position: t.position as number,
-              dueDate: t.dueDate as string | null,
-              createdAt: t.createdAt as string,
-              updatedAt: t.updatedAt as string,
-              assignee: t.assignee as BoardTask["assignee"],
-              reporter: t.reporter as BoardTask["reporter"],
-              subtaskCount: t.subtaskCount as number,
-              parentId: t.parentId as string | null,
-              sprintId: t.sprintId as string | null,
-            })
-          );
-          setTasks(shaped);
-          setPagination(
-            json.data.pagination as {
-              page: number;
-              limit: number;
-              total: number;
-              totalPages: number;
-            }
-          );
-        }
-      } catch (error) {
-        console.error("Failed to fetch tasks:", error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [projectId]
-  );
-
-  /* -------------------------------------------------------------------------- */
-  /*  Sorting (client-side on current page)                                     */
-  /* -------------------------------------------------------------------------- */
-
-  const sortedTasks = useMemo(() => {
-    const sorted = [...tasks];
-    sorted.sort((a, b) => {
-      let comparison = 0;
-      switch (sortField) {
-        case "title":
-          comparison = a.title.localeCompare(b.title);
-          break;
-        case "type":
-          comparison = a.type.localeCompare(b.type);
-          break;
-        case "priority":
-          comparison =
-            PRIORITY_CONFIG[a.priority].order -
-            PRIORITY_CONFIG[b.priority].order;
-          break;
-        case "assignee":
-          comparison = (a.assignee?.name || "").localeCompare(
-            b.assignee?.name || ""
-          );
-          break;
-        case "storyPoints":
-          comparison = (a.storyPoints || 0) - (b.storyPoints || 0);
-          break;
-        case "status":
-          comparison = a.status.localeCompare(b.status);
-          break;
-        case "dueDate":
-          comparison =
-            new Date(a.dueDate || "9999-12-31").getTime() -
-            new Date(b.dueDate || "9999-12-31").getTime();
-          break;
-      }
-      return sortDirection === "asc" ? comparison : -comparison;
-    });
-    return sorted;
-  }, [tasks, sortField, sortDirection]);
-
-  /* -------------------------------------------------------------------------- */
-  /*  Handlers                                                                  */
-  /* -------------------------------------------------------------------------- */
-
-  const handleSort = useCallback(
-    (field: SortField) => {
-      if (sortField === field) {
-        setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
-      } else {
-        setSortField(field);
-        setSortDirection("asc");
-      }
-    },
-    [sortField]
-  );
-
-  const handleSearch = useCallback(
-    (value: string) => {
-      setSearch(value);
-      fetchTasks(1, value, priorityFilter, typeFilter, assigneeFilter);
-    },
-    [fetchTasks, priorityFilter, typeFilter, assigneeFilter]
-  );
-
-  const handlePriorityFilter = useCallback(
-    (value: string) => {
-      setPriorityFilter(value);
-      fetchTasks(1, search, value, typeFilter, assigneeFilter);
-    },
-    [fetchTasks, search, typeFilter, assigneeFilter]
-  );
-
-  const handleTypeFilter = useCallback(
-    (value: string) => {
-      setTypeFilter(value);
-      fetchTasks(1, search, priorityFilter, value, assigneeFilter);
-    },
-    [fetchTasks, search, priorityFilter, assigneeFilter]
-  );
-
-  const handleAssigneeFilter = useCallback(
-    (value: string) => {
-      setAssigneeFilter(value);
-      fetchTasks(1, search, priorityFilter, typeFilter, value);
-    },
-    [fetchTasks, search, priorityFilter, typeFilter]
-  );
-
-  const handleClearFilters = useCallback(() => {
-    setSearch("");
-    setPriorityFilter("all");
-    setTypeFilter("all");
-    setAssigneeFilter("all");
-    fetchTasks(1, "", "all", "all", "all");
-  }, [fetchTasks]);
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      fetchTasks(page, search, priorityFilter, typeFilter, assigneeFilter);
-    },
-    [fetchTasks, search, priorityFilter, typeFilter, assigneeFilter]
-  );
-
-  const handleTaskClick = useCallback((task: BoardTask) => {
-    setSelectedTask(task);
-    setDetailOpen(true);
-  }, []);
-
-  const handleTaskSave = useCallback(
-    async (taskId: string, data: Record<string, unknown>) => {
-      const res = await fetch(
-        `/api/projects/${projectId}/tasks/${taskId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update task");
-
-      // Refresh the current page
-      await fetchTasks(
-        pagination.page,
-        search,
-        priorityFilter,
-        typeFilter,
-        assigneeFilter
-      );
-    },
-    [
-      projectId,
-      fetchTasks,
-      pagination.page,
-      search,
-      priorityFilter,
-      typeFilter,
-      assigneeFilter,
-    ]
-  );
-
-  const handleTaskDelete = useCallback(
-    async (taskId: string) => {
-      const res = await fetch(
-        `/api/projects/${projectId}/tasks/${taskId}`,
-        { method: "DELETE" }
-      );
-
-      if (!res.ok) throw new Error("Failed to delete task");
-
-      // Refresh the current page
-      await fetchTasks(
-        pagination.page,
-        search,
-        priorityFilter,
-        typeFilter,
-        assigneeFilter
-      );
-    },
-    [
-      projectId,
-      fetchTasks,
-      pagination.page,
-      search,
-      priorityFilter,
-      typeFilter,
-      assigneeFilter,
-    ]
-  );
-
-  const handleCreateSubmit = useCallback(
-    async (data: {
-      title: string;
-      columnId: string;
-      priority?: string;
-      type?: string;
-      assigneeId?: string;
-    }) => {
-      const res = await fetch(`/api/projects/${projectId}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) throw new Error("Failed to create task");
-
-      // Refresh current page
-      await fetchTasks(
-        pagination.page,
-        search,
-        priorityFilter,
-        typeFilter,
-        assigneeFilter
-      );
-    },
-    [
-      projectId,
-      fetchTasks,
-      pagination.page,
-      search,
-      priorityFilter,
-      typeFilter,
-      assigneeFilter,
-    ]
-  );
-
-  const hasActiveFilters =
-    search !== "" ||
-    priorityFilter !== "all" ||
-    typeFilter !== "all" ||
-    assigneeFilter !== "all";
-
-  /* -------------------------------------------------------------------------- */
-  /*  Sort header component                                                     */
-  /* -------------------------------------------------------------------------- */
-
-  function SortableHeader({
-    field,
-    children,
-    className,
-  }: {
-    field: SortField;
-    children: React.ReactNode;
-    className?: string;
-  }) {
-    const isActive = sortField === field;
-    return (
-      <button
-        type="button"
-        onClick={() => handleSort(field)}
-        className={cn(
-          "inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors",
-          isActive && "text-foreground",
-          className
-        )}
-      >
-        {children}
-        {isActive ? (
-          sortDirection === "asc" ? (
-            <ArrowUp className="size-3.5" />
-          ) : (
-            <ArrowDown className="size-3.5" />
-          )
-        ) : (
-          <ArrowUpDown className="size-3.5 opacity-40" />
-        )}
-      </button>
-    );
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /*  Render                                                                    */
-  /* -------------------------------------------------------------------------- */
+  const {
+    sortedTasks,
+    pagination,
+    search,
+    priorityFilter,
+    typeFilter,
+    assigneeFilter,
+    sortField,
+    sortDirection,
+    loading,
+    selectedTask,
+    detailOpen,
+    createOpen,
+    hasActiveFilters,
+    setDetailOpen,
+    setCreateOpen,
+    handleSort,
+    handleSearch,
+    handlePriorityFilter,
+    handleTypeFilter,
+    handleAssigneeFilter,
+    handleClearFilters,
+    handlePageChange,
+    handleTaskClick,
+    handleTaskSave,
+    handleTaskDelete,
+    handleCreateSubmit,
+  } = useBacklogData({
+    initialTasks,
+    projectId,
+    initialPagination,
+  });
 
   // Get first column for create dialog
   const firstColumn = columns[0];
 
   return (
     <>
-      {/* ------------------------------------------------------------------ */}
-      {/* Filter bar                                                         */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="flex flex-wrap items-center gap-3 px-6 py-4 border-b bg-background/50">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[240px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search tasks..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9 h-9"
-          />
-        </div>
-
-        {/* Filter icon label */}
-        <div className="flex items-center gap-1.5 text-muted-foreground">
-          <ListFilter className="size-4" />
-          <span className="text-xs font-medium">Filters</span>
-        </div>
-
-        {/* Priority filter */}
-        <Select value={priorityFilter} onValueChange={handlePriorityFilter}>
-          <SelectTrigger className="w-[140px] h-9">
-            <SelectValue placeholder="Priority" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Priorities</SelectItem>
-            <SelectItem value="CRITICAL">Critical</SelectItem>
-            <SelectItem value="HIGH">High</SelectItem>
-            <SelectItem value="MEDIUM">Medium</SelectItem>
-            <SelectItem value="LOW">Low</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Type filter */}
-        <Select value={typeFilter} onValueChange={handleTypeFilter}>
-          <SelectTrigger className="w-[130px] h-9">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="STORY">Story</SelectItem>
-            <SelectItem value="BUG">Bug</SelectItem>
-            <SelectItem value="TASK">Task</SelectItem>
-            <SelectItem value="EPIC">Epic</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Assignee filter */}
-        <Select value={assigneeFilter} onValueChange={handleAssigneeFilter}>
-          <SelectTrigger className="w-[160px] h-9">
-            <SelectValue placeholder="Assignee" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Assignees</SelectItem>
-            {members.map((m) => (
-              <SelectItem key={m.id} value={m.id}>
-                {m.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Clear filters */}
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClearFilters}
-            className="gap-1 text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-3.5" />
-            Clear
-          </Button>
-        )}
-
-        {/* Create task button */}
-        <div className="ml-auto">
-          <Button
-            size="sm"
-            onClick={() => setCreateOpen(true)}
-            className="gap-1.5"
-          >
-            <Plus className="size-4" />
-            Create Task
-          </Button>
-        </div>
-      </div>
+      {/* Filter bar */}
+      <BacklogFilters
+        search={search}
+        priorityFilter={priorityFilter}
+        typeFilter={typeFilter}
+        assigneeFilter={assigneeFilter}
+        hasActiveFilters={hasActiveFilters}
+        members={members}
+        onSearch={handleSearch}
+        onPriorityFilter={handlePriorityFilter}
+        onTypeFilter={handleTypeFilter}
+        onAssigneeFilter={handleAssigneeFilter}
+        onClearFilters={handleClearFilters}
+        onCreateClick={() => setCreateOpen(true)}
+      />
 
       {/* ------------------------------------------------------------------ */}
       {/* Table                                                               */}
@@ -626,27 +183,39 @@ export function BacklogTable({
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead className="w-[380px] py-3.5 px-5">
-                  <SortableHeader field="title">Title</SortableHeader>
+                  <SortableHeader field="title" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
+                    Title
+                  </SortableHeader>
                 </TableHead>
                 <TableHead className="w-[80px] py-3.5 px-4">
-                  <SortableHeader field="type">Type</SortableHeader>
+                  <SortableHeader field="type" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
+                    Type
+                  </SortableHeader>
                 </TableHead>
                 <TableHead className="w-[120px] py-3.5 px-4">
-                  <SortableHeader field="priority">Priority</SortableHeader>
+                  <SortableHeader field="priority" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
+                    Priority
+                  </SortableHeader>
                 </TableHead>
                 <TableHead className="w-[180px] py-3.5 px-4">
-                  <SortableHeader field="assignee">Assignee</SortableHeader>
+                  <SortableHeader field="assignee" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
+                    Assignee
+                  </SortableHeader>
                 </TableHead>
                 <TableHead className="w-[80px] py-3.5 px-4 text-center">
-                  <SortableHeader field="storyPoints" className="justify-center">
+                  <SortableHeader field="storyPoints" sortField={sortField} sortDirection={sortDirection} onSort={handleSort} className="justify-center">
                     SP
                   </SortableHeader>
                 </TableHead>
                 <TableHead className="w-[120px] py-3.5 px-4">
-                  <SortableHeader field="status">Status</SortableHeader>
+                  <SortableHeader field="status" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
+                    Status
+                  </SortableHeader>
                 </TableHead>
                 <TableHead className="w-[130px] py-3.5 px-4">
-                  <SortableHeader field="dueDate">Due Date</SortableHeader>
+                  <SortableHeader field="dueDate" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}>
+                    Due Date
+                  </SortableHeader>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -727,7 +296,7 @@ export function BacklogTable({
                         <span
                           className={cn(
                             "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                            priorityConfig.className
+                            priorityConfig.badgeClassName
                           )}
                         >
                           {priorityConfig.label}
@@ -738,14 +307,14 @@ export function BacklogTable({
                       <TableCell className="py-4 px-4">
                         {task.assignee ? (
                           <div className="flex items-center gap-2">
-                            <Avatar size="sm">
+                            <Avatar className="size-7">
                               {task.assignee.avatar && (
                                 <AvatarImage
                                   src={task.assignee.avatar}
                                   alt={task.assignee.name}
                                 />
                               )}
-                              <AvatarFallback className="text-[10px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                              <AvatarFallback className="text-[11px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
                                 {initials}
                               </AvatarFallback>
                             </Avatar>

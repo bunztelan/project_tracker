@@ -1,29 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-async function getSessionAndMembership(projectId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, membership: null };
-  }
-
-  const membership = await prisma.projectMember.findUnique({
-    where: {
-      userId_projectId: {
-        userId: session.user.id,
-        projectId,
-      },
-    },
-  });
-
-  return { session, membership };
-}
+import { getSessionAndMembership } from "@/lib/api-utils";
 
 /* -------------------------------------------------------------------------- */
 /*  GET /api/projects/[id]/board — board with columns and tasks               */
@@ -78,7 +55,14 @@ export async function GET(
                   },
                 },
                 _count: {
-                  select: { subtasks: true },
+                  select: {
+                    subtasks: true,
+                    comments: true,
+                    attachments: true,
+                  },
+                },
+                subtasks: {
+                  select: { status: true },
                 },
               },
             },
@@ -104,24 +88,37 @@ export async function GET(
         id: col.id,
         name: col.name,
         position: col.position,
-        tasks: col.tasks.map((task) => ({
-          id: task.id,
-          title: task.title,
-          description: task.description,
-          status: task.status,
-          priority: task.priority,
-          type: task.type,
-          storyPoints: task.storyPoints,
-          position: task.position,
-          dueDate: task.dueDate,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-          assignee: task.assignee,
-          reporter: task.reporter,
-          subtaskCount: task._count.subtasks,
-          parentId: task.parentId,
-          sprintId: task.sprintId,
-        })),
+        tasks: col.tasks.map((task) => {
+          const completedCount = task.subtasks.filter(
+            (s: { status: string }) => s.status === "done"
+          ).length;
+
+          return {
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            type: task.type,
+            storyPoints: task.storyPoints,
+            position: task.position,
+            dueDate: task.dueDate,
+            createdAt: task.createdAt,
+            updatedAt: task.updatedAt,
+            assignee: task.assignee,
+            reporter: task.reporter,
+            subtaskCount: task._count.subtasks,
+            commentCount: task._count.comments,
+            attachmentCount: task._count.attachments,
+            totalSubtasks: task._count.subtasks,
+            completedSubtasks: completedCount,
+            subtaskProgress: task._count.subtasks > 0
+              ? Math.round((completedCount / task._count.subtasks) * 100)
+              : 0,
+            parentId: task.parentId,
+            sprintId: task.sprintId,
+          };
+        }),
       })),
     };
 

@@ -5,10 +5,6 @@ import { format } from "date-fns";
 import {
   CalendarIcon,
   Trash2,
-  CheckCircle2,
-  Circle,
-  Square,
-  Diamond,
   Save,
 } from "lucide-react";
 import {
@@ -35,7 +31,8 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import type { BoardTask, BoardColumn } from "./task-card";
+import { PRIORITIES, TYPES } from "@/lib/task-constants";
+import type { BoardTask, BoardColumn } from "@/components/board/task-card";
 import { TaskAttachments } from "./task-attachments";
 import { TaskComments } from "./task-comments";
 
@@ -53,24 +50,6 @@ interface TaskDetailDialogProps {
   onSave: (taskId: string, data: Record<string, unknown>) => Promise<void>;
   onDelete: (taskId: string) => Promise<void>;
 }
-
-/* -------------------------------------------------------------------------- */
-/*  Priority / Type configs                                                   */
-/* -------------------------------------------------------------------------- */
-
-const PRIORITIES = [
-  { value: "LOW", label: "Low", color: "bg-gray-400" },
-  { value: "MEDIUM", label: "Medium", color: "bg-blue-500" },
-  { value: "HIGH", label: "High", color: "bg-orange-500" },
-  { value: "CRITICAL", label: "Critical", color: "bg-red-500" },
-] as const;
-
-const TYPES = [
-  { value: "STORY", label: "Story", icon: CheckCircle2, color: "text-emerald-500" },
-  { value: "BUG", label: "Bug", icon: Circle, color: "text-red-500" },
-  { value: "TASK", label: "Task", icon: Square, color: "text-blue-500" },
-  { value: "EPIC", label: "Epic", icon: Diamond, color: "text-purple-500" },
-] as const;
 
 /* -------------------------------------------------------------------------- */
 /*  Component                                                                 */

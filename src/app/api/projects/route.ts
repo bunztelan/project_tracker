@@ -164,10 +164,10 @@ export async function POST(request: NextRequest) {
 
       await tx.column.createMany({
         data: [
-          { name: "To Do", position: 0, boardId: board.id },
-          { name: "In Progress", position: 1, boardId: board.id },
-          { name: "In Review", position: 2, boardId: board.id },
-          { name: "Done", position: 3, boardId: board.id },
+          { name: "To Do", position: 0, boardId: board.id, statusKey: "todo" },
+          { name: "In Progress", position: 1, boardId: board.id, statusKey: "in_progress" },
+          { name: "In Review", position: 2, boardId: board.id, statusKey: "in_review" },
+          { name: "Done", position: 3, boardId: board.id, statusKey: "done" },
         ],
       });
 

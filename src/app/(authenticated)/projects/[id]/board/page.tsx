@@ -68,7 +68,14 @@ export default async function BoardPage({ params }: BoardPageProps) {
                 },
               },
               _count: {
-                select: { subtasks: true },
+                select: {
+                  subtasks: true,
+                  comments: true,
+                  attachments: true,
+                },
+              },
+              subtasks: {
+                select: { status: true },
               },
             },
           },
@@ -100,24 +107,37 @@ export default async function BoardPage({ params }: BoardPageProps) {
       id: col.id,
       name: col.name,
       position: col.position,
-      tasks: col.tasks.map((task) => ({
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        status: task.status,
-        priority: task.priority,
-        type: task.type,
-        storyPoints: task.storyPoints,
-        position: task.position,
-        dueDate: task.dueDate ? task.dueDate.toISOString() : null,
-        createdAt: task.createdAt.toISOString(),
-        updatedAt: task.updatedAt.toISOString(),
-        assignee: task.assignee,
-        reporter: task.reporter,
-        subtaskCount: task._count.subtasks,
-        parentId: task.parentId,
-        sprintId: task.sprintId,
-      })),
+      tasks: col.tasks.map((task) => {
+        const completedCount = task.subtasks.filter(
+          (s: { status: string }) => s.status === "done"
+        ).length;
+
+        return {
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          priority: task.priority,
+          type: task.type,
+          storyPoints: task.storyPoints,
+          position: task.position,
+          dueDate: task.dueDate ? task.dueDate.toISOString() : null,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+          assignee: task.assignee,
+          reporter: task.reporter,
+          subtaskCount: task._count.subtasks,
+          commentCount: task._count.comments,
+          attachmentCount: task._count.attachments,
+          totalSubtasks: task._count.subtasks,
+          completedSubtasks: completedCount,
+          subtaskProgress: task._count.subtasks > 0
+            ? Math.round((completedCount / task._count.subtasks) * 100)
+            : 0,
+          parentId: task.parentId,
+          sprintId: task.sprintId,
+        };
+      }),
     })),
   };
 

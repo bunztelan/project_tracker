@@ -1,27 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { unlink } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                    */
-/* -------------------------------------------------------------------------- */
-
-async function getSessionAndMembership(projectId: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return { session: null, membership: null };
-
-  const membership = await prisma.projectMember.findUnique({
-    where: {
-      userId_projectId: { userId: session.user.id, projectId },
-    },
-  });
-
-  return { session, membership };
-}
+import { deleteFromBlob } from "@/lib/blob";
+import { getSessionAndMembership } from "@/lib/api-utils";
 
 /* -------------------------------------------------------------------------- */
 /*  DELETE /api/projects/[id]/tasks/[taskId]/comments/[commentId]             */
@@ -78,12 +58,9 @@ export async function DELETE(
       );
     }
 
-    // Delete attachment files from disk
+    // Delete attachment files from blob storage
     for (const att of comment.attachments) {
-      const absPath = path.join(process.cwd(), "uploads", att.filePath);
-      if (existsSync(absPath)) {
-        await unlink(absPath);
-      }
+      await deleteFromBlob(att.filePath);
     }
 
     // Delete comment (cascades to attachments via Prisma)
