@@ -22,10 +22,14 @@ export default async function ProjectLayout({
     notFound();
   }
 
-  // Fetch project and verify membership in parallel
+  // Fetch project (scoped by active org) and verify membership in parallel
+  const organizationId = session.user.activeOrganizationId;
   const [project, membership] = await Promise.all([
-    prisma.project.findUnique({
-      where: { id },
+    prisma.project.findFirst({
+      where: {
+        id,
+        ...(organizationId ? { organizationId } : {}),
+      },
       select: {
         id: true,
         name: true,
