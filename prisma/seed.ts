@@ -15,10 +15,10 @@ async function main() {
   const memberPassword = await hash("member123", 12);
 
   const admin = await prisma.user.upsert({
-    where: { email: "admin@projecttracker.com" },
-    update: {},
+    where: { email: "admin@planowiz.com" },
+    update: { password: adminPassword },
     create: {
-      email: "admin@projecttracker.com",
+      email: "admin@planowiz.com",
       name: "Admin User",
       password: adminPassword,
       role: Role.ADMIN,
@@ -26,10 +26,10 @@ async function main() {
   });
 
   const manager = await prisma.user.upsert({
-    where: { email: "manager@projecttracker.com" },
-    update: {},
+    where: { email: "manager@planowiz.com" },
+    update: { password: managerPassword },
     create: {
-      email: "manager@projecttracker.com",
+      email: "manager@planowiz.com",
       name: "Manager User",
       password: managerPassword,
       role: Role.MANAGER,
@@ -37,10 +37,10 @@ async function main() {
   });
 
   const member = await prisma.user.upsert({
-    where: { email: "member@projecttracker.com" },
-    update: {},
+    where: { email: "member@planowiz.com" },
+    update: { password: memberPassword },
     create: {
-      email: "member@projecttracker.com",
+      email: "member@planowiz.com",
       name: "Member User",
       password: memberPassword,
       role: Role.MEMBER,
