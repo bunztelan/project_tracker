@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { MAX_COLUMNS, MIN_COLUMNS } from "@/lib/task-constants";
 import { KanbanColumn } from "./kanban-column";
 import { TaskCardOverlay, type BoardData, type BoardColumn, type BoardTask } from "./task-card";
-import { TaskDetailDialog } from "./task-detail-dialog";
+import { TaskDetailDialog } from "@/components/shared/task-detail-dialog";
 import { CreateTaskDialog } from "./create-task-dialog";
 
 /* -------------------------------------------------------------------------- */

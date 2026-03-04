@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { TaskDetailDialog } from "@/components/board/task-detail-dialog";
+import { TaskDetailDialog } from "@/components/shared/task-detail-dialog";
 import { CreateTaskDialog } from "@/components/board/create-task-dialog";
 import { cn } from "@/lib/utils";
 import { PRIORITY_CONFIG, TYPE_CONFIG, STATUS_CONFIG } from "@/lib/task-constants";

@@ -32,7 +32,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { PRIORITIES, TYPES } from "@/lib/task-constants";
-import type { BoardTask, BoardColumn } from "./task-card";
+import type { BoardTask, BoardColumn } from "@/components/board/task-card";
 import { TaskAttachments } from "./task-attachments";
 import { TaskComments } from "./task-comments";
 
