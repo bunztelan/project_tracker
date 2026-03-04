@@ -114,9 +114,9 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
 
   useEffect(() => {
     fetch("/api/organizations")
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data.data) setOrganizations(data.data);
+        if (data?.data) setOrganizations(data.data);
       })
       .catch(() => {});
   }, []);
