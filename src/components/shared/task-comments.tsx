@@ -244,7 +244,7 @@ export function TaskComments({ projectId, taskId }: TaskCommentsProps) {
                   {comment.author.avatar && (
                     <AvatarImage src={comment.author.avatar} alt={comment.author.name} />
                   )}
-                  <AvatarFallback className="text-[10px] bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300">
+                  <AvatarFallback className="text-[10px] bg-gradient-to-br from-brand-600 to-brand-500 text-white">
                     {getInitials(comment.author.name)}
                   </AvatarFallback>
                 </Avatar>

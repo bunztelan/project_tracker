@@ -214,8 +214,8 @@ export function ChartBuilder({ uploads, onWidgetSaved }: ChartBuilderProps) {
   if (uploads.length === 0) {
     return (
       <div className="flex h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-700">
-        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-500/20 dark:to-indigo-500/20">
-          <Sparkles className="h-7 w-7 text-violet-600 dark:text-violet-400" />
+        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-500/20 dark:to-brand-500/20">
+          <Sparkles className="h-7 w-7 text-brand-600 dark:text-brand-400" />
         </div>
         <p className="text-sm font-semibold text-foreground">No data to visualize</p>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -293,7 +293,7 @@ export function ChartBuilder({ uploads, onWidgetSaved }: ChartBuilderProps) {
                     className={`
                       flex flex-col items-center gap-1 rounded-lg border-2 p-2.5 transition-all
                       ${chartType === ct.type
-                        ? "border-violet-500 bg-violet-50 text-violet-700 shadow-sm dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/60"
+                        ? "border-brand-500 bg-brand-50 text-brand-700 shadow-sm dark:bg-brand-500/15 dark:text-brand-400 dark:border-brand-500/60"
                         : "border-transparent bg-muted/50 text-muted-foreground hover:border-gray-300 hover:bg-muted dark:hover:border-zinc-600"
                       }
                     `}
@@ -350,12 +350,12 @@ export function ChartBuilder({ uploads, onWidgetSaved }: ChartBuilderProps) {
                   {yAxes.map((y) => (
                     <span
                       key={y}
-                      className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-medium text-violet-700 dark:bg-violet-500/20 dark:text-violet-400"
+                      className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-500/20 dark:text-brand-400"
                     >
                       {y}
                       <button
                         onClick={() => handleRemoveYAxis(y)}
-                        className="ml-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-500/30"
+                        className="ml-0.5 rounded-full hover:bg-brand-200 dark:hover:bg-brand-500/30"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -405,7 +405,7 @@ export function ChartBuilder({ uploads, onWidgetSaved }: ChartBuilderProps) {
                       className={`
                         rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-all
                         ${kpiAggregation === agg
-                          ? "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400"
+                          ? "bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-400"
                           : "bg-muted/50 text-muted-foreground hover:bg-muted"
                         }
                       `}
@@ -421,7 +421,7 @@ export function ChartBuilder({ uploads, onWidgetSaved }: ChartBuilderProps) {
             <Button
               onClick={handleSaveWidget}
               disabled={!canSave || saving}
-              className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/25 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:from-brand-700 hover:to-brand-600 shadow-md shadow-brand-500/25 disabled:opacity-50"
             >
               {saving ? (
                 <>
@@ -457,8 +457,8 @@ export function ChartBuilder({ uploads, onWidgetSaved }: ChartBuilderProps) {
             />
           ) : (
             <div className="flex h-72 flex-col items-center justify-center">
-              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-500/20 dark:to-indigo-500/20">
-                <Sparkles className="h-7 w-7 text-violet-500/50 dark:text-violet-400/50" />
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-500/20 dark:to-brand-500/20">
+                <Sparkles className="h-7 w-7 text-brand-500/50 dark:text-brand-400/50" />
               </div>
               <p className="text-sm font-medium text-muted-foreground/70">
                 Configure your chart

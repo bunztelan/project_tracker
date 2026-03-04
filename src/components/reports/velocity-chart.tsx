@@ -109,9 +109,9 @@ export function VelocityChart({ data }: VelocityChartProps) {
     return (
       <div className="flex h-80 items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-500/20">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20">
             <svg
-              className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
+              className="h-6 w-6 text-brand-600 dark:text-brand-400"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}

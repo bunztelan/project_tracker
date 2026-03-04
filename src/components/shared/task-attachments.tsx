@@ -235,7 +235,7 @@ export function TaskAttachments({ projectId, taskId }: TaskAttachmentsProps) {
           min-h-[48px] rounded-lg border border-dashed transition-colors
           ${
             isDragOver
-              ? "border-violet-500 bg-violet-50/50 dark:bg-violet-500/10"
+              ? "border-brand-500 bg-brand-50/50 dark:bg-brand-500/10"
               : attachments.length === 0
                 ? "border-border/50"
                 : "border-transparent"

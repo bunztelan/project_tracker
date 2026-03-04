@@ -65,7 +65,7 @@ export default async function ProjectLayout({
       {/* Project sub-header */}
       <div className="border-b bg-muted/30 px-6 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
             {project.key.slice(0, 3)}
           </div>
           <div>

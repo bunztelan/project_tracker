@@ -153,7 +153,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
       {/* App Header / Brand */}
       <SidebarHeader className="h-14 flex-row items-center px-4 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-3 group/brand">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 shadow-md shadow-violet-500/25 transition-shadow group-hover/brand:shadow-lg group-hover/brand:shadow-violet-500/35">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-500 shadow-md shadow-brand-500/25 transition-shadow group-hover/brand:shadow-lg group-hover/brand:shadow-brand-500/35">
             <FolderKanban className="h-4 w-4 text-white" />
           </div>
           {!isCollapsed && (
@@ -190,15 +190,15 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
                       tooltip={item.title}
                       className={
                         isActive
-                          ? "bg-gradient-to-r from-violet-500/15 to-indigo-500/10 text-violet-700 font-semibold hover:from-violet-500/20 hover:to-indigo-500/15 dark:from-violet-500/25 dark:to-indigo-500/20 dark:text-violet-300"
-                          : "text-muted-foreground hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-500/10 dark:hover:text-violet-300"
+                          ? "bg-gradient-to-r from-brand-500/15 to-brand-500/10 text-brand-700 font-semibold hover:from-brand-500/20 hover:to-brand-500/15 dark:from-brand-500/25 dark:to-brand-500/20 dark:text-brand-300"
+                          : "text-muted-foreground hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/10 dark:hover:text-brand-300"
                       }
                     >
                       <Link href={item.href}>
                         <item.icon
                           className={
                             isActive
-                              ? "text-violet-600 dark:text-violet-400"
+                              ? "text-brand-600 dark:text-brand-400"
                               : ""
                           }
                         />
@@ -219,15 +219,15 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
                       tooltip={adminNavItem.title}
                       className={
                         isActive
-                          ? "bg-gradient-to-r from-violet-500/15 to-indigo-500/10 text-violet-700 font-semibold hover:from-violet-500/20 hover:to-indigo-500/15 dark:from-violet-500/25 dark:to-indigo-500/20 dark:text-violet-300"
-                          : "text-muted-foreground hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-500/10 dark:hover:text-violet-300"
+                          ? "bg-gradient-to-r from-brand-500/15 to-brand-500/10 text-brand-700 font-semibold hover:from-brand-500/20 hover:to-brand-500/15 dark:from-brand-500/25 dark:to-brand-500/20 dark:text-brand-300"
+                          : "text-muted-foreground hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/10 dark:hover:text-brand-300"
                       }
                     >
                       <Link href={adminNavItem.href}>
                         <adminNavItem.icon
                           className={
                             isActive
-                              ? "text-violet-600 dark:text-violet-400"
+                              ? "text-brand-600 dark:text-brand-400"
                               : ""
                           }
                         />
@@ -250,9 +250,9 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
               {!isCollapsed && projectCtx?.project && (
                 <Link
                   href={`/projects/${projectId}/board`}
-                  className="mx-2 mb-1 flex items-center gap-2.5 rounded-lg bg-violet-50 px-3 py-2 transition-colors hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/15"
+                  className="mx-2 mb-1 flex items-center gap-2.5 rounded-lg bg-brand-50 px-3 py-2 transition-colors hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/15"
                 >
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-violet-600 to-indigo-600 text-[11px] font-bold text-white shadow-sm">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-500 text-[11px] font-bold text-white shadow-sm">
                     {projectCtx.project.key.slice(0, 2)}
                   </div>
                   <div className="flex flex-col overflow-hidden">
@@ -278,15 +278,15 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
                           tooltip={item.title}
                           className={
                             isActive
-                              ? "bg-gradient-to-r from-violet-500/15 to-indigo-500/10 text-violet-700 font-semibold hover:from-violet-500/20 hover:to-indigo-500/15 dark:from-violet-500/25 dark:to-indigo-500/20 dark:text-violet-300"
-                              : "text-muted-foreground hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-500/10 dark:hover:text-violet-300"
+                              ? "bg-gradient-to-r from-brand-500/15 to-brand-500/10 text-brand-700 font-semibold hover:from-brand-500/20 hover:to-brand-500/15 dark:from-brand-500/25 dark:to-brand-500/20 dark:text-brand-300"
+                              : "text-muted-foreground hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/10 dark:hover:text-brand-300"
                           }
                         >
                           <Link href={href}>
                             <item.icon
                               className={
                                 isActive
-                                  ? "text-violet-600 dark:text-violet-400"
+                                  ? "text-brand-600 dark:text-brand-400"
                                   : ""
                               }
                             />
@@ -312,10 +312,10 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
                 <SidebarMenuButton
                   size="lg"
                   tooltip={userName}
-                  className="hover:bg-violet-50 dark:hover:bg-violet-500/10 data-[state=open]:bg-violet-50 dark:data-[state=open]:bg-violet-500/10"
+                  className="hover:bg-brand-50 dark:hover:bg-brand-500/10 data-[state=open]:bg-brand-50 dark:data-[state=open]:bg-brand-500/10"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-violet-500 to-indigo-500 text-xs font-semibold text-white">
+                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-brand-600 to-brand-500 text-xs font-semibold text-white">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
@@ -324,7 +324,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
                     <span className="truncate text-xs text-muted-foreground">
                       <Badge
                         variant="secondary"
-                        className="mt-0.5 h-4 px-1.5 text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300"
+                        className="mt-0.5 h-4 px-1.5 text-[10px] font-medium bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300"
                       >
                         {roleLabel}
                       </Badge>
@@ -341,7 +341,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
               >
                 <div className="flex items-center gap-3 px-3 py-2">
                   <Avatar className="h-9 w-9 rounded-lg">
-                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-violet-500 to-indigo-500 text-xs font-semibold text-white">
+                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-brand-600 to-brand-500 text-xs font-semibold text-white">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>

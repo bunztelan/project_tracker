@@ -377,7 +377,7 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
                     isWeekend(day)
                       ? "text-muted-foreground/40 bg-muted/20"
                       : "text-muted-foreground/70",
-                    isToday(day) && "text-violet-700 font-bold dark:text-violet-300"
+                    isToday(day) && "text-brand-700 font-bold dark:text-brand-300"
                   )}
                   style={{ width: DAY_WIDTH, minWidth: DAY_WIDTH }}
                 >
@@ -431,14 +431,14 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
                     key={`left-${task.id}`}
                     className={cn(
                       "group flex items-center gap-2 border-b border-border/40 px-3 cursor-pointer transition-colors",
-                      "hover:bg-violet-50/50 dark:hover:bg-violet-500/5",
+                      "hover:bg-brand-50/50 dark:hover:bg-brand-500/5",
                       idx % 2 === 0 ? "bg-white dark:bg-zinc-950" : "bg-muted/10"
                     )}
                     style={{ height: ROW_HEIGHT }}
                     onClick={() => handleTaskClick(task.id)}
                   >
                     <TypeIcon className={cn("size-3.5 shrink-0", typeConf.className)} />
-                    <span className="text-xs font-medium text-foreground truncate flex-1 group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
+                    <span className="text-xs font-medium text-foreground truncate flex-1 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors">
                       {task.title}
                     </span>
                     {task.assignee && (
@@ -446,7 +446,7 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
                         {task.assignee.avatar && (
                           <AvatarImage src={task.assignee.avatar} alt={task.assignee.name} />
                         )}
-                        <AvatarFallback className="text-[9px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                        <AvatarFallback className="text-[9px] bg-gradient-to-br from-brand-600 to-brand-500 text-white">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
@@ -493,10 +493,10 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
                   bottom: 0,
                 }}
               >
-                <div className="absolute -top-[28px] -translate-x-1/2 bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
+                <div className="absolute -top-[28px] -translate-x-1/2 bg-brand-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
                   Today
                 </div>
-                <div className="w-0.5 h-full bg-violet-500/60 dark:bg-violet-400/50" />
+                <div className="w-0.5 h-full bg-brand-500/60 dark:bg-brand-400/50" />
               </div>
             )}
 
@@ -533,7 +533,7 @@ export function GanttChart({ tasks, sprints, projectId }: GanttChartProps) {
                             "absolute top-[8px] h-[28px] rounded-md border cursor-pointer",
                             "flex items-center px-2 transition-all",
                             "hover:shadow-md hover:scale-y-110 hover:brightness-95",
-                            "focus:outline-none focus:ring-2 focus:ring-violet-400/50",
+                            "focus:outline-none focus:ring-2 focus:ring-brand-400/50",
                             colors.bg,
                             colors.border,
                             barStyle.isSingleDay && "justify-center"

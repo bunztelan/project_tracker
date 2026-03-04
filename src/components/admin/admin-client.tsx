@@ -244,7 +244,7 @@ export function AdminClient({ users: initialUsers, currentUserId }: AdminClientP
           }}
         >
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/25 hover:shadow-lg hover:shadow-violet-500/35 hover:from-violet-700 hover:to-indigo-700">
+            <Button className="bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md shadow-brand-500/25 hover:shadow-lg hover:shadow-brand-500/35 hover:from-brand-700 hover:to-brand-600">
               <Plus className="mr-2 h-4 w-4" />
               Create User
             </Button>
@@ -325,7 +325,7 @@ export function AdminClient({ users: initialUsers, currentUserId }: AdminClientP
                 disabled={
                   isLoading || !newName.trim() || !newEmail.trim() || !newPassword.trim()
                 }
-                className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700"
+                className="bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:from-brand-700 hover:to-brand-600"
               >
                 {isLoading ? "Creating..." : "Create User"}
               </Button>
@@ -374,7 +374,7 @@ export function AdminClient({ users: initialUsers, currentUserId }: AdminClientP
                 return (
                   <TableRow
                     key={user.id}
-                    className="group h-16 transition-colors hover:bg-violet-50/50 dark:hover:bg-violet-500/5"
+                    className="group h-16 transition-colors hover:bg-brand-50/50 dark:hover:bg-brand-500/5"
                   >
                     {/* Avatar + Name */}
                     <TableCell className="pl-6">
@@ -383,7 +383,7 @@ export function AdminClient({ users: initialUsers, currentUserId }: AdminClientP
                           {user.avatar && (
                             <AvatarImage src={user.avatar} alt={user.name} />
                           )}
-                          <AvatarFallback className="bg-gradient-to-br from-violet-500 to-indigo-500 text-xs font-semibold text-white">
+                          <AvatarFallback className="bg-gradient-to-br from-brand-600 to-brand-500 text-xs font-semibold text-white">
                             {getInitials(user.name)}
                           </AvatarFallback>
                         </Avatar>
@@ -392,7 +392,7 @@ export function AdminClient({ users: initialUsers, currentUserId }: AdminClientP
                             {user.name}
                           </span>
                           {isCurrentUser && (
-                            <span className="text-[10px] font-medium text-violet-600 dark:text-violet-400">
+                            <span className="text-[10px] font-medium text-brand-600 dark:text-brand-400">
                               You
                             </span>
                           )}

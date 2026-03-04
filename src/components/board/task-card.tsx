@@ -111,7 +111,7 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
         "group relative rounded-xl border bg-white p-4 shadow-sm transition-all dark:bg-zinc-900",
         isDragging && !isDragOverlay && "opacity-30",
         isDragOverlay &&
-          "rotate-[2deg] scale-105 shadow-xl ring-2 ring-violet-400/50",
+          "rotate-[2deg] scale-105 shadow-xl ring-2 ring-brand-400/50",
         !isDragging &&
           !isDragOverlay &&
           "hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
@@ -182,7 +182,7 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
                 alt={task.assignee.name}
               />
             )}
-            <AvatarFallback className="text-[11px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+            <AvatarFallback className="text-[11px] bg-gradient-to-br from-brand-600 to-brand-500 text-white">
               {initials}
             </AvatarFallback>
           </Avatar>

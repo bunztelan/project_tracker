@@ -217,9 +217,9 @@ export default async function ProjectsPage() {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="animate-dash-fade-up flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Projects
           </h1>
           <p className="mt-1 text-muted-foreground">
@@ -231,7 +231,7 @@ export default async function ProjectsPage() {
 
         {canCreate && (
           <Link href="/projects/new">
-            <Button className="h-11 gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 text-white shadow-md shadow-violet-500/25 transition-all hover:from-violet-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-violet-500/30">
+            <Button className="h-11 gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-white shadow-md shadow-brand-500/25 transition-all hover:from-brand-700 hover:to-brand-600 hover:shadow-lg hover:shadow-brand-500/30">
               <Plus className="h-4 w-4" />
               New Project
             </Button>
@@ -251,7 +251,10 @@ export default async function ProjectsPage() {
 
       {/* Projects Grid */}
       {!fetchError && projects.length > 0 && (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div
+          className="animate-dash-fade-up grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+          style={{ animationDelay: "75ms" }}
+        >
           {projects.map((project, index) => (
             <ProjectCard
               key={project.id}
@@ -264,9 +267,12 @@ export default async function ProjectsPage() {
 
       {/* Empty State */}
       {!fetchError && projects.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/25 px-8 py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-500/20 dark:to-indigo-500/20">
-            <FolderOpen className="h-8 w-8 text-violet-600 dark:text-violet-400" />
+        <div
+          className="animate-dash-fade-up flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/25 px-8 py-20 text-center"
+          style={{ animationDelay: "75ms" }}
+        >
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-500/20 dark:to-brand-400/20">
+            <FolderOpen className="h-8 w-8 text-brand-600 dark:text-brand-400" />
           </div>
           <h3 className="mt-5 text-lg font-semibold text-foreground">
             No projects yet
@@ -278,7 +284,7 @@ export default async function ProjectsPage() {
           </p>
           {canCreate && (
             <Link href="/projects/new" className="mt-6">
-              <Button className="h-11 gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 text-white shadow-md shadow-violet-500/25 transition-all hover:from-violet-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-violet-500/30">
+              <Button className="h-11 gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 px-6 text-white shadow-md shadow-brand-500/25 transition-all hover:from-brand-700 hover:to-brand-600 hover:shadow-lg hover:shadow-brand-500/30">
                 <Plus className="h-4 w-4" />
                 Create your first project
               </Button>

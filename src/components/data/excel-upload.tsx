@@ -161,12 +161,12 @@ export function ExcelUpload({ onUploadSuccess }: ExcelUploadProps) {
         className={`
           relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-all duration-200
           ${isDragOver
-            ? "border-violet-500 bg-violet-50/50 dark:bg-violet-500/10 scale-[1.01]"
+            ? "border-brand-500 bg-brand-50/50 dark:bg-brand-500/10 scale-[1.01]"
             : uploadState === "error"
               ? "border-red-300 bg-red-50/30 dark:border-red-500/40 dark:bg-red-500/5"
               : uploadState === "success"
                 ? "border-green-300 bg-green-50/30 dark:border-green-500/40 dark:bg-green-500/5"
-                : "border-gray-300 bg-gray-50/30 hover:border-violet-400 hover:bg-violet-50/30 dark:border-zinc-700 dark:bg-zinc-800/30 dark:hover:border-violet-500/50 dark:hover:bg-violet-500/5"
+                : "border-gray-300 bg-gray-50/30 hover:border-brand-400 hover:bg-brand-50/30 dark:border-zinc-700 dark:bg-zinc-800/30 dark:hover:border-brand-500/50 dark:hover:bg-brand-500/5"
           }
           ${uploadState === "idle" ? "cursor-pointer" : ""}
         `}
@@ -182,14 +182,14 @@ export function ExcelUpload({ onUploadSuccess }: ExcelUploadProps) {
         {/* Upload states */}
         {uploadState === "idle" && (
           <>
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-500/20 dark:to-indigo-500/20">
-              <Upload className="h-7 w-7 text-violet-600 dark:text-violet-400" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-500/20 dark:to-brand-500/20">
+              <Upload className="h-7 w-7 text-brand-600 dark:text-brand-400" />
             </div>
             <p className="text-base font-semibold text-foreground">
               Drop your file here
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              or <span className="text-violet-600 dark:text-violet-400 font-medium">browse</span> to choose a file
+              or <span className="text-brand-600 dark:text-brand-400 font-medium">browse</span> to choose a file
             </p>
             <p className="mt-3 text-xs text-muted-foreground/70">
               Supports .xlsx, .xls, .csv (max 10 MB)
@@ -199,8 +199,8 @@ export function ExcelUpload({ onUploadSuccess }: ExcelUploadProps) {
 
         {(uploadState === "selected" || uploadState === "uploading") && file && (
           <div className="flex w-full max-w-sm items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-500/20 dark:to-indigo-500/20">
-              <FileSpreadsheet className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-500/20 dark:to-brand-500/20">
+              <FileSpreadsheet className="h-6 w-6 text-brand-600 dark:text-brand-400" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
@@ -254,7 +254,7 @@ export function ExcelUpload({ onUploadSuccess }: ExcelUploadProps) {
         <div className="flex justify-end">
           <Button
             onClick={handleUpload}
-            className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/25"
+            className="bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:from-brand-700 hover:to-brand-600 shadow-md shadow-brand-500/25"
           >
             <Upload className="mr-2 h-4 w-4" />
             Upload File
@@ -264,7 +264,7 @@ export function ExcelUpload({ onUploadSuccess }: ExcelUploadProps) {
 
       {uploadState === "uploading" && (
         <div className="flex justify-end">
-          <Button disabled className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+          <Button disabled className="bg-gradient-to-r from-brand-600 to-brand-500 text-white">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Uploading...
           </Button>

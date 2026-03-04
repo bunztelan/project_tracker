@@ -186,12 +186,12 @@ export function SprintTaskPicker({
 
         {/* Selection summary */}
         {selected.size > 0 && (
-          <div className="flex items-center gap-2 rounded-lg bg-violet-50 dark:bg-violet-900/20 px-3 py-2">
-            <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+          <div className="flex items-center gap-2 rounded-lg bg-brand-50 dark:bg-brand-900/20 px-3 py-2">
+            <span className="text-sm font-medium text-brand-700 dark:text-brand-300">
               {selected.size} task{selected.size > 1 ? "s" : ""} selected
             </span>
             {totalPoints > 0 && (
-              <span className="text-xs text-violet-600/70 dark:text-violet-400/70">
+              <span className="text-xs text-brand-600/70 dark:text-brand-400/70">
                 ({totalPoints} story point{totalPoints > 1 ? "s" : ""})
               </span>
             )}
@@ -232,7 +232,7 @@ export function SprintTaskPicker({
                     className={cn(
                       "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all",
                       isSelected
-                        ? "bg-violet-50 border border-violet-200 dark:bg-violet-900/20 dark:border-violet-700"
+                        ? "bg-brand-50 border border-brand-200 dark:bg-brand-900/20 dark:border-brand-700"
                         : "hover:bg-muted/50 border border-transparent"
                     )}
                   >
@@ -241,7 +241,7 @@ export function SprintTaskPicker({
                       className={cn(
                         "flex size-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
                         isSelected
-                          ? "border-violet-600 bg-violet-600 text-white"
+                          ? "border-brand-600 bg-brand-600 text-white"
                           : "border-muted-foreground/30"
                       )}
                     >
@@ -291,7 +291,7 @@ export function SprintTaskPicker({
 
                     {/* Story points */}
                     {task.storyPoints != null && task.storyPoints > 0 && (
-                      <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-[11px] font-bold text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                      <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
                         {task.storyPoints}
                       </span>
                     )}

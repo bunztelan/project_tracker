@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -102,12 +103,15 @@ export function AppHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
+      {/* Theme Toggle */}
+      <ThemeToggle />
+
       {/* User Avatar + Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-2 rounded-full outline-none ring-offset-background transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-gradient-to-br from-violet-500 to-indigo-500 text-xs font-semibold text-white">
+              <AvatarFallback className="bg-gradient-to-br from-brand-600 to-brand-500 text-xs font-semibold text-white">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
@@ -116,7 +120,7 @@ export function AppHeader() {
         <DropdownMenuContent align="end" className="w-56 rounded-lg">
           <div className="flex items-center gap-3 px-3 py-2">
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-gradient-to-br from-violet-500 to-indigo-500 text-xs font-semibold text-white">
+              <AvatarFallback className="bg-gradient-to-br from-brand-600 to-brand-500 text-xs font-semibold text-white">
                 {userInitials}
               </AvatarFallback>
             </Avatar>

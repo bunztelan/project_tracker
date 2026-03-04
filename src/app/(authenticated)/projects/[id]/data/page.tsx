@@ -256,7 +256,7 @@ export default function DataPage() {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-            <FileSpreadsheet className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+            <FileSpreadsheet className="h-4 w-4 text-brand-600 dark:text-brand-400" />
             Upload & Preview
           </h2>
           <Button
@@ -298,8 +298,8 @@ export default function DataPage() {
                       key={upload.id}
                       className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/30"
                     >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-500/20 dark:to-indigo-500/20">
-                        <FileSpreadsheet className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-500/20 dark:to-brand-500/20">
+                        <FileSpreadsheet className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">
@@ -320,7 +320,7 @@ export default function DataPage() {
                           onClick={() => handlePreview(upload.id)}
                           className={
                             previewUploadId === upload.id
-                              ? "text-violet-600 dark:text-violet-400"
+                              ? "text-brand-600 dark:text-brand-400"
                               : ""
                           }
                         >
@@ -362,7 +362,7 @@ export default function DataPage() {
                 <CardContent>
                   {loadingPreview ? (
                     <div className="flex h-48 items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+                      <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
                     </div>
                   ) : previewData ? (
                     <DataPreviewTable
@@ -386,7 +386,7 @@ export default function DataPage() {
       {/* ================================================================== */}
       <section className="space-y-6">
         <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+          <BarChart3 className="h-4 w-4 text-brand-600 dark:text-brand-400" />
           Visualization
         </h2>
 
@@ -456,7 +456,7 @@ export default function DataPage() {
                         />
                       ) : (
                         <div className="flex h-48 items-center justify-center">
-                          <Loader2 className="h-5 w-5 animate-spin text-violet-500/50" />
+                          <Loader2 className="h-5 w-5 animate-spin text-brand-500/50" />
                         </div>
                       )}
                     </CardContent>

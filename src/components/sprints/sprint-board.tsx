@@ -311,15 +311,15 @@ export function SprintBoard({
         : null;
 
     return (
-      <div className="relative rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50/80 via-white to-violet-50/50 shadow-lg dark:border-blue-800 dark:from-blue-950/30 dark:via-zinc-900 dark:to-violet-950/20">
+      <div className="relative rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50/80 via-white to-brand-50/50 shadow-lg dark:border-blue-800 dark:from-blue-950/30 dark:via-zinc-900 dark:to-brand-950/20">
         {/* Gradient accent bar at top */}
-        <div className="h-1.5 rounded-t-lg bg-gradient-to-r from-blue-500 via-violet-500 to-indigo-500" />
+        <div className="h-1.5 rounded-t-lg bg-gradient-to-r from-blue-500 via-brand-500 to-brand-500" />
 
         <div className="p-6">
           {/* Header */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 shadow-md shadow-blue-500/20">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-brand-600 shadow-md shadow-blue-500/20">
                 <Zap className="size-5 text-white" />
               </div>
               <div>
@@ -434,7 +434,7 @@ export function SprintBoard({
           <div className="mt-4">
             <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-violet-500 transition-all duration-500 ease-out"
+                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-brand-500 transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -539,7 +539,7 @@ export function SprintBoard({
                     "h-full rounded-full transition-all",
                     sectionType === "completed"
                       ? "bg-emerald-500"
-                      : "bg-violet-500"
+                      : "bg-brand-500"
                   )}
                   style={{ width: `${progress}%` }}
                 />
@@ -809,7 +809,7 @@ function TaskList({
 
             {/* Story Points */}
             {task.storyPoints != null && task.storyPoints > 0 && (
-              <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-[10px] font-bold text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+              <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-bold text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
                 {task.storyPoints}
               </span>
             )}
@@ -817,7 +817,7 @@ function TaskList({
             {/* Assignee */}
             {task.assignee && (
               <Avatar className="size-6 shrink-0">
-                <AvatarFallback className="text-[9px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                <AvatarFallback className="text-[9px] bg-gradient-to-br from-brand-600 to-brand-500 text-white">
                   {getInitials(task.assignee.name)}
                 </AvatarFallback>
               </Avatar>

@@ -1,0 +1,28 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  BRAND PALETTE — Edit these values to change the entire app's accent color
+ *
+ *  Current: Violet (hue ≈ 293 in oklch)
+ *
+ *  To switch to a different color, change all oklch hue values below:
+ *
+ *    Blue    → 264  |  Indigo  → 277  |  Violet  → 293
+ *    Purple  → 306  |  Fuchsia → 322  |  Pink    → 350
+ *    Rose    → 12   |  Red     → 25   |  Orange  → 47
+ *    Amber   → 75   |  Emerald → 163  |  Teal    → 180
+ *    Cyan    → 205  |  Sky     → 233
+ *
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme inline {
+  --color-brand-50:  oklch(0.969 0.016 293);
+  --color-brand-100: oklch(0.943 0.037 293);
+  --color-brand-200: oklch(0.894 0.072 293);
+  --color-brand-300: oklch(0.811 0.130 293);
+  --color-brand-400: oklch(0.713 0.194 293);
+  --color-brand-500: oklch(0.627 0.239 293);
+  --color-brand-600: oklch(0.558 0.256 293);
+  --color-brand-700: oklch(0.491 0.233 293);
+  --color-brand-800: oklch(0.432 0.200 293);
+  --color-brand-900: oklch(0.380 0.163 293);
+  --color-brand-950: oklch(0.283 0.141 293);
+}

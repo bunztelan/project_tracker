@@ -451,7 +451,7 @@ export function SettingsClient({
                 <Button
                   onClick={handleSaveGeneral}
                   disabled={generalSaving || !projectName.trim()}
-                  className="bg-violet-600 hover:bg-violet-700 text-white"
+                  className="bg-brand-600 hover:bg-brand-700 text-white"
                 >
                   {generalSaving ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -491,14 +491,14 @@ export function SettingsClient({
                     key={key}
                     className={`relative flex items-start gap-4 rounded-xl border p-4 transition-all ${
                       enabled && !depDisabled
-                        ? "border-violet-300 bg-violet-50/50 shadow-sm dark:border-violet-700 dark:bg-violet-950/30"
+                        ? "border-brand-300 bg-brand-50/50 shadow-sm dark:border-brand-700 dark:bg-brand-950/30"
                         : "border-border bg-card hover:border-muted-foreground/20"
                     }`}
                   >
                     <div
                       className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${
                         enabled && !depDisabled
-                          ? "bg-violet-100 text-violet-600 dark:bg-violet-900 dark:text-violet-300"
+                          ? "bg-brand-100 text-brand-600 dark:bg-brand-900 dark:text-brand-300"
                           : "bg-muted text-muted-foreground"
                       }`}
                     >
@@ -513,7 +513,7 @@ export function SettingsClient({
                             handleToggleFeature(key, checked)
                           }
                           disabled={!isAdminOrManager || depDisabled}
-                          className="data-[state=checked]:bg-violet-600"
+                          className="data-[state=checked]:bg-brand-600"
                         />
                       </div>
                       <p className="mt-0.5 text-xs text-muted-foreground">
@@ -546,7 +546,7 @@ export function SettingsClient({
               <Button
                 onClick={handleSaveFeatures}
                 disabled={featuresSaving}
-                className="mt-6 bg-violet-600 hover:bg-violet-700 text-white"
+                className="mt-6 bg-brand-600 hover:bg-brand-700 text-white"
               >
                 {featuresSaving ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -576,7 +576,7 @@ export function SettingsClient({
               {isAdminOrManager && (
                 <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-violet-600 hover:bg-violet-700 text-white">
+                    <Button className="bg-brand-600 hover:bg-brand-700 text-white">
                       <UserPlus className="size-4" />
                       Add Member
                     </Button>
@@ -627,7 +627,7 @@ export function SettingsClient({
                       <Button
                         onClick={handleAddMember}
                         disabled={addingMember || !newMemberEmail.trim()}
-                        className="bg-violet-600 hover:bg-violet-700 text-white"
+                        className="bg-brand-600 hover:bg-brand-700 text-white"
                       >
                         {addingMember ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -684,7 +684,7 @@ export function SettingsClient({
                                   alt={member.user.name}
                                 />
                               )}
-                              <AvatarFallback className="bg-violet-100 text-violet-700 text-xs dark:bg-violet-900 dark:text-violet-300">
+                              <AvatarFallback className="bg-gradient-to-br from-brand-600 to-brand-500 text-white text-xs">
                                 {getInitials(member.user.name)}
                               </AvatarFallback>
                             </Avatar>

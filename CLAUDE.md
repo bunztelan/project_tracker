@@ -44,6 +44,12 @@ Monday.com-inspired — **NOT Jira**. Client explicitly dislikes Jira's UI. Foll
 
 Single Next.js codebase: App Router (frontend) + API Routes (backend) + Prisma ORM + PostgreSQL. Containerized with Docker.
 
+## Commit Messages
+
+- Short and simple, no Co-Authored-By line
+- Format: `type: brief description` (e.g. `fix: avatar sizing`, `feat: dashboard redesign`)
+- Types: feat, fix, refactor, chore, docs, style, test
+
 ## Design Doc
 
 Full design at `docs/plans/2026-03-03-project-tracker-design.md`

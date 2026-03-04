@@ -321,7 +321,7 @@ function KpiView({ config, data }: { config: WidgetConfig; data: Record<string, 
   return (
     <div className="flex h-72 flex-col items-center justify-center">
       <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      <p className="mt-2 text-5xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+      <p className="mt-2 text-5xl font-bold bg-gradient-to-r from-brand-600 to-brand-500 bg-clip-text text-transparent">
         {kpiValue.toLocaleString()}
       </p>
       <p className="mt-2 text-xs text-muted-foreground/70 capitalize">
@@ -340,8 +340,8 @@ export function ChartRenderer({ type, config, data, className }: ChartRendererPr
     return (
       <div className={`flex h-72 items-center justify-center ${className || ""}`}>
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-500/20">
-            <BarChart className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20">
+            <BarChart className="h-6 w-6 text-brand-600 dark:text-brand-400" />
           </div>
           <p className="text-sm font-medium text-muted-foreground">No data available</p>
         </div>

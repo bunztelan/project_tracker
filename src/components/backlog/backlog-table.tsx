@@ -266,7 +266,7 @@ export function BacklogTable({
                         "cursor-pointer transition-colors",
                         index % 2 === 1 &&
                           "bg-muted/20 dark:bg-muted/10",
-                        "hover:bg-violet-50/50 dark:hover:bg-violet-950/20"
+                        "hover:bg-brand-50/50 dark:hover:bg-brand-950/20"
                       )}
                     >
                       {/* Title */}
@@ -314,7 +314,7 @@ export function BacklogTable({
                                   alt={task.assignee.name}
                                 />
                               )}
-                              <AvatarFallback className="text-[11px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                              <AvatarFallback className="text-[11px] bg-gradient-to-br from-brand-600 to-brand-500 text-white">
                                 {initials}
                               </AvatarFallback>
                             </Avatar>
@@ -332,7 +332,7 @@ export function BacklogTable({
                       {/* Story Points */}
                       <TableCell className="py-4 px-4 text-center">
                         {task.storyPoints != null && task.storyPoints > 0 ? (
-                          <span className="inline-flex size-6 items-center justify-center rounded-full bg-violet-100 text-[11px] font-bold text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                          <span className="inline-flex size-6 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
                             {task.storyPoints}
                           </span>
                         ) : (

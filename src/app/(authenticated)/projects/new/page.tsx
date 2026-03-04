@@ -104,19 +104,22 @@ export default function NewProjectPage() {
       {/* Back link */}
       <Link
         href="/projects"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        className="animate-dash-fade-up inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to projects
       </Link>
 
       {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/25">
-          <FolderPlus className="h-6 w-6 text-white" />
+      <div
+        className="animate-dash-fade-up flex items-center gap-4"
+        style={{ animationDelay: "50ms" }}
+      >
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-500/10">
+          <FolderPlus className="h-6 w-6 text-brand-600 dark:text-brand-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Create New Project
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -126,7 +129,10 @@ export default function NewProjectPage() {
       </div>
 
       {/* Form Card */}
-      <Card className="rounded-2xl border shadow-sm">
+      <Card
+        className="animate-dash-fade-up rounded-2xl border shadow-sm"
+        style={{ animationDelay: "100ms" }}
+      >
         <CardHeader>
           <CardTitle>Project Details</CardTitle>
           <CardDescription>
@@ -190,7 +196,7 @@ export default function NewProjectPage() {
 
             {/* Preview */}
             {name.trim() && key.length >= 2 && (
-              <div className="rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-4 dark:border-violet-500/20 dark:bg-violet-500/5">
+              <div className="rounded-xl border border-dashed border-brand-200 bg-brand-50/50 p-4 dark:border-brand-500/20 dark:bg-brand-500/5">
                 <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Preview
                 </p>
@@ -198,7 +204,7 @@ export default function NewProjectPage() {
                   <span className="text-base font-semibold text-foreground">
                     {name.trim()}
                   </span>
-                  <span className="inline-flex items-center rounded-md bg-violet-100 px-2 py-0.5 text-[11px] font-mono font-semibold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
+                  <span className="inline-flex items-center rounded-md bg-brand-100 px-2 py-0.5 text-[11px] font-mono font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
                     {key}
                   </span>
                 </div>
@@ -227,7 +233,7 @@ export default function NewProjectPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="h-11 gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 text-white shadow-md shadow-violet-500/25 transition-all hover:from-violet-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-violet-500/30"
+                className="h-11 gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 px-6 text-white shadow-md shadow-brand-500/25 transition-all hover:from-brand-700 hover:to-brand-600 hover:shadow-lg hover:shadow-brand-500/30"
               >
                 {isLoading ? (
                   <>

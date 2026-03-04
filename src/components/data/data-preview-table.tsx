@@ -152,7 +152,7 @@ export function DataPreviewTable({ sheets, sheetNames }: DataPreviewTableProps) 
               className={`
                 shrink-0 rounded-md px-3 py-1.5 text-sm font-medium transition-all
                 ${activeSheet === name
-                  ? "bg-white text-violet-700 shadow-sm dark:bg-zinc-800 dark:text-violet-400"
+                  ? "bg-white text-brand-700 shadow-sm dark:bg-zinc-800 dark:text-brand-400"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
                 }
               `}

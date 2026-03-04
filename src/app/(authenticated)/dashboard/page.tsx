@@ -12,6 +12,7 @@ import {
   Users,
   Activity,
   TrendingUp,
+  Plus,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -23,7 +24,7 @@ interface KpiCard {
   label: string;
   value: number;
   icon: React.ElementType;
-  color: "violet" | "blue" | "amber" | "green";
+  color: "violet" | "blue" | "amber" | "emerald";
 }
 
 interface RecentProject {
@@ -38,99 +39,68 @@ interface RecentProject {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Color map — each KPI card gets a unique accent                             */
+/*  Color tokens                                                              */
 /* -------------------------------------------------------------------------- */
 
 const colorMap = {
   violet: {
-    bg: "bg-gradient-to-br from-violet-500/10 to-violet-600/5",
-    border: "border-l-4 border-l-violet-500",
-    iconBg: "bg-violet-100 dark:bg-violet-500/20",
-    iconText: "text-violet-600 dark:text-violet-400",
-    valueText: "text-violet-700 dark:text-violet-300",
+    bg: "bg-violet-50 dark:bg-violet-500/10",
+    text: "text-violet-600 dark:text-violet-400",
   },
   blue: {
-    bg: "bg-gradient-to-br from-blue-500/10 to-blue-600/5",
-    border: "border-l-4 border-l-blue-500",
-    iconBg: "bg-blue-100 dark:bg-blue-500/20",
-    iconText: "text-blue-600 dark:text-blue-400",
-    valueText: "text-blue-700 dark:text-blue-300",
+    bg: "bg-blue-50 dark:bg-blue-500/10",
+    text: "text-blue-600 dark:text-blue-400",
   },
   amber: {
-    bg: "bg-gradient-to-br from-amber-500/10 to-amber-600/5",
-    border: "border-l-4 border-l-amber-500",
-    iconBg: "bg-amber-100 dark:bg-amber-500/20",
-    iconText: "text-amber-600 dark:text-amber-400",
-    valueText: "text-amber-700 dark:text-amber-300",
+    bg: "bg-amber-50 dark:bg-amber-500/10",
+    text: "text-amber-600 dark:text-amber-400",
   },
-  green: {
-    bg: "bg-gradient-to-br from-emerald-500/10 to-emerald-600/5",
-    border: "border-l-4 border-l-emerald-500",
-    iconBg: "bg-emerald-100 dark:bg-emerald-500/20",
-    iconText: "text-emerald-600 dark:text-emerald-400",
-    valueText: "text-emerald-700 dark:text-emerald-300",
+  emerald: {
+    bg: "bg-emerald-50 dark:bg-emerald-500/10",
+    text: "text-emerald-600 dark:text-emerald-400",
   },
 } as const;
+
+const statusDot: Record<string, string> = {
+  active: "bg-emerald-500",
+  planning: "bg-blue-500",
+  completed: "bg-violet-500",
+  on_hold: "bg-amber-500",
+  archived: "bg-gray-400",
+};
 
 /* -------------------------------------------------------------------------- */
 /*  Data fetching                                                             */
 /* -------------------------------------------------------------------------- */
 
 async function getDashboardData(userId: string) {
-  // Fetch all projects the user is a member of
   const memberships = await prisma.projectMember.findMany({
     where: { userId },
     select: { projectId: true },
   });
   const projectIds = memberships.map((m) => m.projectId);
 
-  // Run aggregate queries in parallel
   const [totalProjects, totalTasks, tasksInProgress, tasksCompleted, recentProjectsRaw] =
     await Promise.all([
-      // Total projects count
-      prisma.project.count({
-        where: { id: { in: projectIds } },
-      }),
-
-      // Total tasks across user's projects
+      prisma.project.count({ where: { id: { in: projectIds } } }),
+      prisma.task.count({ where: { projectId: { in: projectIds } } }),
       prisma.task.count({
-        where: { projectId: { in: projectIds } },
+        where: { projectId: { in: projectIds }, status: "in_progress" },
       }),
-
-      // Tasks currently in progress
       prisma.task.count({
-        where: {
-          projectId: { in: projectIds },
-          status: "in_progress",
-        },
+        where: { projectId: { in: projectIds }, status: "done" },
       }),
-
-      // Completed tasks
-      prisma.task.count({
-        where: {
-          projectId: { in: projectIds },
-          status: "done",
-        },
-      }),
-
-      // Recent 5 projects with member + task counts
       prisma.project.findMany({
         where: { id: { in: projectIds } },
         orderBy: { updatedAt: "desc" },
         take: 5,
         include: {
-          _count: {
-            select: { members: true, tasks: true },
-          },
-          tasks: {
-            where: { status: "done" },
-            select: { id: true },
-          },
+          _count: { select: { members: true, tasks: true } },
+          tasks: { where: { status: "done" }, select: { id: true } },
         },
       }),
     ]);
 
-  // Map recent projects to include tasksDone count
   const recentProjects: RecentProject[] = recentProjectsRaw.map((p) => ({
     id: p.id,
     name: p.name,
@@ -142,69 +112,73 @@ async function getDashboardData(userId: string) {
     tasksDone: p.tasks.length,
   }));
 
-  return {
-    totalProjects,
-    totalTasks,
-    tasksInProgress,
-    tasksCompleted,
-    recentProjects,
-  };
+  return { totalProjects, totalTasks, tasksInProgress, tasksCompleted, recentProjects };
 }
 
 /* -------------------------------------------------------------------------- */
-/*  KPI Card Component                                                        */
+/*  KPI Card                                                                  */
 /* -------------------------------------------------------------------------- */
 
-function KpiCardItem({ card }: { card: KpiCard }) {
-  const colors = colorMap[card.color];
+function KpiCardItem({ card, index }: { card: KpiCard; index: number }) {
+  const c = colorMap[card.color];
   const Icon = card.icon;
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border ${colors.border} ${colors.bg} p-6 shadow-sm transition-shadow hover:shadow-md`}
+      className="animate-dash-fade-up rounded-2xl border bg-card p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+      style={{ animationDelay: `${index * 75}ms` }}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">
-            {card.label}
-          </p>
-          <p className={`text-4xl font-bold tracking-tight ${colors.valueText}`}>
-            {card.value}
-          </p>
-        </div>
+      <div className="flex items-center gap-3">
         <div
-          className={`flex h-12 w-12 items-center justify-center rounded-xl ${colors.iconBg}`}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${c.bg}`}
         >
-          <Icon className={`h-6 w-6 ${colors.iconText}`} />
+          <Icon className={`h-5 w-5 ${c.text}`} />
         </div>
+        <span className="text-sm font-medium text-muted-foreground">
+          {card.label}
+        </span>
       </div>
+      <p className="mt-4 text-3xl font-bold tracking-tight text-foreground">
+        {card.value}
+      </p>
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Project Card Component                                                    */
+/*  Project Card                                                              */
 /* -------------------------------------------------------------------------- */
 
-function ProjectCard({ project }: { project: RecentProject }) {
+function ProjectCard({
+  project,
+  index,
+}: {
+  project: RecentProject;
+  index: number;
+}) {
   const totalTasks = project._count.tasks;
   const doneTasks = project.tasksDone;
-  const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+  const progress =
+    totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+  const dot = statusDot[project.status] ?? "bg-gray-400";
 
   return (
     <Link
       href={`/projects/${project.id}/board`}
-      className="group block rounded-xl border bg-card p-5 shadow-sm transition-all hover:shadow-md hover:border-violet-200 dark:hover:border-violet-500/30"
+      className="animate-dash-fade-up group block rounded-2xl border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-brand-200 dark:hover:border-brand-500/20"
+      style={{ animationDelay: `${250 + index * 60}ms` }}
     >
+      {/* Title row */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2.5">
-            <h3 className="truncate text-base font-semibold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
+          <div className="flex items-center gap-2">
+            <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
+            <h3 className="truncate font-semibold text-foreground transition-colors group-hover:text-brand-700 dark:group-hover:text-brand-300">
               {project.name}
             </h3>
             <Badge
               variant="secondary"
-              className="shrink-0 bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 text-[11px] font-mono font-semibold"
+              className="shrink-0 text-[11px] font-mono font-medium"
             >
               {project.key}
             </Badge>
@@ -215,31 +189,33 @@ function ProjectCard({ project }: { project: RecentProject }) {
             </p>
           )}
         </div>
-        <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
+        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
       </div>
 
-      {/* Stats row */}
+      {/* Stats */}
       <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <Users className="h-3.5 w-3.5" />
-          {project._count.members} member{project._count.members !== 1 ? "s" : ""}
+          {project._count.members} member
+          {project._count.members !== 1 ? "s" : ""}
         </span>
         <span className="flex items-center gap-1.5">
           <CheckSquare className="h-3.5 w-3.5" />
-          {totalTasks} task{totalTasks !== 1 ? "s" : ""}
+          {doneTasks}/{totalTasks} tasks
         </span>
+        {totalTasks > 0 && (
+          <span className="ml-auto text-xs font-medium text-foreground">
+            {progress}%
+          </span>
+        )}
       </div>
 
       {/* Progress bar */}
       {totalTasks > 0 && (
         <div className="mt-3">
-          <div className="mb-1 flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Progress</span>
-            <span className="font-medium text-foreground">{progress}%</span>
-          </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-500"
+              className="h-full rounded-full bg-brand-500 transition-all duration-500 dark:bg-brand-400"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -250,18 +226,26 @@ function ProjectCard({ project }: { project: RecentProject }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Page Component                                                            */
+/*  Page                                                                      */
 /* -------------------------------------------------------------------------- */
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
-    redirect("/login");
-  }
+  if (!session?.user) redirect("/login");
 
   const userName = session.user.name ?? "there";
   const firstName = userName.split(" ")[0];
+
+  /* Time-aware greeting */
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const dateStr = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   let dashboardData: Awaited<ReturnType<typeof getDashboardData>> | null = null;
   let fetchError = false;
@@ -273,78 +257,66 @@ export default async function DashboardPage() {
   }
 
   const kpiCards: KpiCard[] = [
-    {
-      label: "Total Projects",
-      value: dashboardData?.totalProjects ?? 0,
-      icon: FolderOpen,
-      color: "violet",
-    },
-    {
-      label: "Total Tasks",
-      value: dashboardData?.totalTasks ?? 0,
-      icon: CheckSquare,
-      color: "blue",
-    },
-    {
-      label: "In Progress",
-      value: dashboardData?.tasksInProgress ?? 0,
-      icon: Clock,
-      color: "amber",
-    },
-    {
-      label: "Completed",
-      value: dashboardData?.tasksCompleted ?? 0,
-      icon: CheckCircle2,
-      color: "green",
-    },
+    { label: "Projects", value: dashboardData?.totalProjects ?? 0, icon: FolderOpen, color: "violet" },
+    { label: "Total Tasks", value: dashboardData?.totalTasks ?? 0, icon: CheckSquare, color: "blue" },
+    { label: "In Progress", value: dashboardData?.tasksInProgress ?? 0, icon: Clock, color: "amber" },
+    { label: "Completed", value: dashboardData?.tasksCompleted ?? 0, icon: CheckCircle2, color: "emerald" },
   ];
 
   return (
     <div className="space-y-8">
-      {/* Welcome Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Welcome back, {firstName}
+      {/* ── Greeting ─────────────────────────────────────────── */}
+      <div className="animate-dash-fade-up">
+        <p className="text-sm font-medium text-muted-foreground">{dateStr}</p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
+          {greeting}, {firstName}
         </h1>
-        <p className="mt-1 text-muted-foreground">
-          Here&apos;s an overview of your projects and tasks.
-        </p>
+        {dashboardData && dashboardData.totalTasks > 0 && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {dashboardData.tasksInProgress} task
+            {dashboardData.tasksInProgress !== 1 ? "s" : ""} in progress
+            {" \u00b7 "}
+            {dashboardData.tasksCompleted} completed
+          </p>
+        )}
       </div>
 
-      {/* Database connection notice */}
+      {/* ── DB error notice ──────────────────────────────────── */}
       {fetchError && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
-          <p className="font-medium">Database not connected</p>
-          <p className="mt-1 text-amber-700 dark:text-amber-400">
-            Dashboard data will appear once the database is configured and
-            running.
+        <div
+          className="animate-dash-fade-up rounded-2xl border border-amber-200 bg-amber-50/50 p-5 dark:border-amber-500/20 dark:bg-amber-500/5"
+          style={{ animationDelay: "50ms" }}
+        >
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+            Database not connected
+          </p>
+          <p className="mt-1 text-sm text-amber-700/80 dark:text-amber-400/80">
+            Dashboard data will appear once the database is configured.
           </p>
         </div>
       )}
 
-      {/* KPI Cards */}
-      <section>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground/70">
-          Overview
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {kpiCards.map((card) => (
-            <KpiCardItem key={card.label} card={card} />
-          ))}
-        </div>
-      </section>
+      {/* ── KPI Cards ────────────────────────────────────────── */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {kpiCards.map((card, i) => (
+          <KpiCardItem key={card.label} card={card} index={i} />
+        ))}
+      </div>
 
-      {/* Recent Projects + Activity Feed */}
+      {/* ── Main grid ────────────────────────────────────────── */}
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Recent Projects — takes 2/3 */}
+        {/* Recent Projects (2/3) */}
         <section className="lg:col-span-2">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70">
+          <div
+            className="animate-dash-fade-up mb-4 flex items-center justify-between"
+            style={{ animationDelay: "200ms" }}
+          >
+            <h2 className="text-lg font-semibold text-foreground">
               Recent Projects
             </h2>
             <Link
               href="/projects"
-              className="flex items-center gap-1 text-sm font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors"
+              className="flex items-center gap-1 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
             >
               View all
               <ArrowRight className="h-3.5 w-3.5" />
@@ -353,14 +325,17 @@ export default async function DashboardPage() {
 
           {dashboardData && dashboardData.recentProjects.length > 0 ? (
             <div className="grid gap-3 sm:grid-cols-2">
-              {dashboardData.recentProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+              {dashboardData.recentProjects.map((project, i) => (
+                <ProjectCard key={project.id} project={project} index={i} />
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-500/20">
-                <FolderOpen className="h-7 w-7 text-violet-600 dark:text-violet-400" />
+            <div
+              className="animate-dash-fade-up flex flex-col items-center justify-center rounded-2xl border border-dashed p-12 text-center"
+              style={{ animationDelay: "300ms" }}
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 dark:bg-brand-500/10">
+                <FolderOpen className="h-7 w-7 text-brand-600 dark:text-brand-400" />
               </div>
               <h3 className="mt-4 text-sm font-semibold text-foreground">
                 No projects yet
@@ -368,42 +343,67 @@ export default async function DashboardPage() {
               <p className="mt-1 text-sm text-muted-foreground">
                 Create your first project to get started.
               </p>
+              <Link
+                href="/projects"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+              >
+                <Plus className="h-4 w-4" />
+                New Project
+              </Link>
             </div>
           )}
         </section>
 
-        {/* Activity Feed — takes 1/3 */}
-        <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground/70">
-            Recent Activity
+        {/* Activity (1/3) */}
+        <section
+          className="animate-dash-fade-up"
+          style={{ animationDelay: "350ms" }}
+        >
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
+            Activity
           </h2>
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
+
+          <div className="overflow-hidden rounded-2xl border bg-card">
+            {/* Placeholder */}
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
                 <Activity className="h-6 w-6 text-muted-foreground" />
               </div>
               <p className="mt-4 text-sm font-medium text-foreground">
-                Activity tracking coming soon
+                Coming soon
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                We&apos;ll show your recent actions and team updates here.
+                Recent actions and team updates
               </p>
             </div>
 
-            {/* Placeholder activity items for visual effect */}
-            <div className="mt-4 space-y-3 border-t pt-4">
-              {[
-                { icon: TrendingUp, text: "Project analytics", color: "text-violet-500" },
-                { icon: CheckCircle2, text: "Task completion tracking", color: "text-emerald-500" },
-                { icon: Users, text: "Team collaboration feed", color: "text-blue-500" },
-              ].map((item) => (
+            {/* Feature preview items */}
+            <div className="space-y-1 border-t px-4 py-3">
+              {(
+                [
+                  { icon: TrendingUp, label: "Project analytics", color: "violet" },
+                  { icon: CheckCircle2, label: "Task tracking", color: "emerald" },
+                  { icon: Users, label: "Team feed", color: "blue" },
+                ] as const
+              ).map((item) => (
                 <div
-                  key={item.text}
-                  className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 text-sm text-muted-foreground"
+                  key={item.label}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5"
                 >
-                  <item.icon className={`h-4 w-4 ${item.color}`} />
-                  <span>{item.text}</span>
-                  <Badge variant="outline" className="ml-auto text-[10px]">
+                  <div
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${colorMap[item.color].bg}`}
+                  >
+                    <item.icon
+                      className={`h-3.5 w-3.5 ${colorMap[item.color].text}`}
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {item.label}
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className="ml-auto text-[10px] font-normal"
+                  >
                     Soon
                   </Badge>
                 </div>
