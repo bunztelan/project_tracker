@@ -103,6 +103,7 @@ export async function GET(
             storyPoints: task.storyPoints,
             position: task.position,
             dueDate: task.dueDate,
+            startDate: task.startDate,
             createdAt: task.createdAt,
             updatedAt: task.updatedAt,
             assignee: task.assignee,

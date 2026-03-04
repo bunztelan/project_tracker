@@ -32,6 +32,7 @@ export type BoardTask = {
   storyPoints: number | null;
   position: number;
   dueDate: string | null;
+  startDate: string | null;
   createdAt: string;
   updatedAt: string;
   assignee: TaskAssignee | null;
