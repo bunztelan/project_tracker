@@ -73,6 +73,7 @@ export function TaskDetailDialog({
   const [assigneeId, setAssigneeId] = useState<string>("none");
   const [storyPoints, setStoryPoints] = useState<string>("");
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -89,6 +90,7 @@ export function TaskDetailDialog({
         task.storyPoints != null ? String(task.storyPoints) : ""
       );
       setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
+      setStartDate(task.startDate ? new Date(task.startDate) : undefined);
     }
   }, [task]);
 
@@ -105,6 +107,7 @@ export function TaskDetailDialog({
         assigneeId: assigneeId === "none" ? null : assigneeId,
         storyPoints: storyPoints ? parseInt(storyPoints, 10) : null,
         dueDate: dueDate ? dueDate.toISOString() : null,
+        startDate: startDate ? startDate.toISOString() : null,
       };
       await onSave(task.id, data);
       onOpenChange(false);
@@ -113,7 +116,7 @@ export function TaskDetailDialog({
     }
   }, [
     task, title, description, priority, type, status,
-    assigneeId, storyPoints, dueDate, onSave, onOpenChange,
+    assigneeId, storyPoints, dueDate, startDate, onSave, onOpenChange,
   ]);
 
   const handleDelete = useCallback(async () => {
@@ -290,6 +293,52 @@ export function TaskDetailDialog({
                     className="h-8 w-20 text-xs"
                   />
                 </div>
+
+                {/* Start Date */}
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Start Date
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start text-left text-xs font-normal h-8",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-1.5 size-3" />
+                        {startDate ? format(startDate, "MMM d, yyyy") : "Pick date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {startDate && (
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => setStartDate(undefined)}
+                      className="text-[10px] text-muted-foreground h-5 px-1"
+                    >
+                      Clear date
+                    </Button>
+                  )}
+                </div>
+
+                {startDate && dueDate && startDate > dueDate && (
+                  <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                    Start date is after due date
+                  </p>
+                )}
 
                 {/* Due Date */}
                 <div className="space-y-1.5">
