@@ -26,7 +26,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const auth = await authorize(id);
     if (!auth.ok) {
       return NextResponse.json(
-        { data: null, error: "Unauthorized", message: auth.message },
+        { data: null, error: auth.status === 401 ? "Unauthorized" : "Forbidden", message: auth.message },
         { status: auth.status }
       );
     }
@@ -84,7 +84,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const auth = await authorize(id);
     if (!auth.ok) {
       return NextResponse.json(
-        { data: null, error: "Unauthorized", message: auth.message },
+        { data: null, error: auth.status === 401 ? "Unauthorized" : "Forbidden", message: auth.message },
         { status: auth.status }
       );
     }
