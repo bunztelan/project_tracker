@@ -69,8 +69,8 @@ export async function GET(
             avatar: true,
           },
         },
-        subtasks: {
-          orderBy: { createdAt: "asc" },
+        checklistItems: {
+          orderBy: { position: "asc" },
           include: {
             assignee: {
               select: {
@@ -110,14 +110,13 @@ export async function GET(
       reporter: task.reporter,
       parentId: task.parentId,
       sprintId: task.sprintId,
-      subtasks: task.subtasks.map((st) => ({
+      subtasks: task.checklistItems.map((st) => ({
         id: st.id,
         title: st.title,
-        status: st.status,
-        priority: st.priority,
-        type: st.type,
+        completed: st.completed,
+        position: st.position,
         assignee: st.assignee,
-        createdAt: st.createdAt,
+        assigneeId: st.assigneeId,
       })),
     };
 
@@ -227,7 +226,7 @@ export async function PATCH(
           },
         },
         _count: {
-          select: { subtasks: true },
+          select: { checklistItems: true },
         },
       },
     });
@@ -248,7 +247,7 @@ export async function PATCH(
       columnId: task.columnId,
       assignee: task.assignee,
       reporter: task.reporter,
-      subtaskCount: task._count.subtasks,
+      subtaskCount: task._count.checklistItems,
       parentId: task.parentId,
       sprintId: task.sprintId,
     };
