@@ -102,6 +102,7 @@ export function useBacklogData({
               storyPoints: t.storyPoints as number | null,
               position: t.position as number,
               dueDate: t.dueDate as string | null,
+              startDate: t.startDate as string | null,
               createdAt: t.createdAt as string,
               updatedAt: t.updatedAt as string,
               assignee: t.assignee as BoardTask["assignee"],

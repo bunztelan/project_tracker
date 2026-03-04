@@ -122,6 +122,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
           storyPoints: task.storyPoints,
           position: task.position,
           dueDate: task.dueDate ? task.dueDate.toISOString() : null,
+          startDate: task.startDate ? task.startDate.toISOString() : null,
           createdAt: task.createdAt.toISOString(),
           updatedAt: task.updatedAt.toISOString(),
           assignee: task.assignee,

@@ -298,6 +298,7 @@ export function KanbanBoard({
         storyPoints: null,
         position: 0,
         dueDate: null,
+        startDate: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         assignee: null,
