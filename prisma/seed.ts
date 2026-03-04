@@ -88,7 +88,7 @@ async function main() {
   // ── 2. Demo Project ──────────────────────────────────────────────
   const project = await prisma.project.upsert({
     where: { key: "DEMO" },
-    update: {},
+    update: { organizationId: defaultOrg.id },
     create: {
       name: "Demo Project",
       description: "A demo project to explore ProjectTracker features",
