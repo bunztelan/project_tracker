@@ -58,6 +58,7 @@ model User {
   projectMembers ProjectMember[]
   comments       Comment[]
   attachments    Attachment[]
+  assignedSubtasks Subtask[]
 }
 
 model Project {
@@ -145,7 +146,8 @@ model Task {
   parent   Task?    @relation("TaskSubtasks", fields: [parentId], references: [id])
   subtasks Task[]   @relation("TaskSubtasks")
   comments    Comment[]
-  attachments Attachment[]
+  attachments    Attachment[]
+  checklistItems Subtask[]
 
   @@index([projectId, status])
   @@index([columnId, position])
@@ -239,4 +241,19 @@ model Attachment {
   task       Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
   comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   uploadedBy User     @relation(fields: [uploadedById], references: [id])
+}
+
+model Subtask {
+  id         String   @id @default(cuid())
+  title      String
+  completed  Boolean  @default(false)
+  position   Int      @default(0)
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assigneeId String?
+  assignee   User?    @relation(fields: [assigneeId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([taskId])
 }
