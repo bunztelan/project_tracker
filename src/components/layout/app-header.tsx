@@ -87,9 +87,9 @@ export function AppHeader() {
       {/* Breadcrumb */}
       <Breadcrumb className="flex-1">
         <BreadcrumbList>
-          {crumbs.map((crumb, idx) => (
+          {crumbs.flatMap((crumb, idx) => [
+            ...(idx > 0 ? [<BreadcrumbSeparator key={`sep-${crumb.href}`} />] : []),
             <BreadcrumbItem key={crumb.href}>
-              {idx > 0 && <BreadcrumbSeparator />}
               {crumb.isLast ? (
                 <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
               ) : (
@@ -97,8 +97,8 @@ export function AppHeader() {
                   <Link href={crumb.href}>{crumb.label}</Link>
                 </BreadcrumbLink>
               )}
-            </BreadcrumbItem>
-          ))}
+            </BreadcrumbItem>,
+          ])}
         </BreadcrumbList>
       </Breadcrumb>
 
