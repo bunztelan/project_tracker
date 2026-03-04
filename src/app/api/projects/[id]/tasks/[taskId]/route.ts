@@ -18,6 +18,7 @@ const updateTaskSchema = z.object({
   assigneeId: z.string().optional().nullable(),
   storyPoints: z.number().int().min(0).optional().nullable(),
   dueDate: z.string().optional().nullable(),
+  startDate: z.string().optional().nullable(),
   parentId: z.string().optional().nullable(),
   sprintId: z.string().optional().nullable(),
   position: z.number().int().min(0).optional(),
@@ -101,6 +102,7 @@ export async function GET(
       storyPoints: task.storyPoints,
       position: task.position,
       dueDate: task.dueDate,
+      startDate: task.startDate,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
       columnId: task.columnId,
@@ -200,6 +202,9 @@ export async function PATCH(
     if (fields.dueDate !== undefined) {
       updateData.dueDate = fields.dueDate ? new Date(fields.dueDate) : null;
     }
+    if (fields.startDate !== undefined) {
+      updateData.startDate = fields.startDate ? new Date(fields.startDate) : null;
+    }
 
     const task = await prisma.task.update({
       where: { id: taskId },
@@ -237,6 +242,7 @@ export async function PATCH(
       storyPoints: task.storyPoints,
       position: task.position,
       dueDate: task.dueDate,
+      startDate: task.startDate,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
       columnId: task.columnId,
