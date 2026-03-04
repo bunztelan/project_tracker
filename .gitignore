@@ -46,3 +46,6 @@ src/generated
 
 # file uploads
 /uploads
+
+# worktrees
+.worktrees/
