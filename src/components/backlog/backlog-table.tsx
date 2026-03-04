@@ -4,10 +4,6 @@ import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import {
-  CheckCircle2,
-  Circle,
-  Square,
-  Diamond,
   Search,
   ArrowUpDown,
   ArrowUp,
@@ -39,6 +35,7 @@ import {
 import { TaskDetailDialog } from "@/components/board/task-detail-dialog";
 import { CreateTaskDialog } from "@/components/board/create-task-dialog";
 import { cn } from "@/lib/utils";
+import { PRIORITY_CONFIG, TYPE_CONFIG, STATUS_CONFIG } from "@/lib/task-constants";
 import type { BoardTask, BoardColumn } from "@/components/board/task-card";
 
 /* -------------------------------------------------------------------------- */
@@ -75,81 +72,6 @@ type SortField =
   | "dueDate";
 
 type SortDirection = "asc" | "desc";
-
-/* -------------------------------------------------------------------------- */
-/*  Priority config                                                           */
-/* -------------------------------------------------------------------------- */
-
-const PRIORITY_CONFIG: Record<
-  BoardTask["priority"],
-  { label: string; className: string; order: number }
-> = {
-  CRITICAL: {
-    label: "Critical",
-    className:
-      "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
-    order: 4,
-  },
-  HIGH: {
-    label: "High",
-    className:
-      "bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
-    order: 3,
-  },
-  MEDIUM: {
-    label: "Medium",
-    className:
-      "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
-    order: 2,
-  },
-  LOW: {
-    label: "Low",
-    className:
-      "bg-gray-50 text-gray-600 border border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-700",
-    order: 1,
-  },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Type config                                                               */
-/* -------------------------------------------------------------------------- */
-
-const TYPE_CONFIG: Record<
-  BoardTask["type"],
-  { icon: typeof CheckCircle2; className: string; label: string }
-> = {
-  STORY: { icon: CheckCircle2, className: "text-emerald-500", label: "Story" },
-  BUG: { icon: Circle, className: "text-red-500", label: "Bug" },
-  TASK: { icon: Square, className: "text-blue-500", label: "Task" },
-  EPIC: { icon: Diamond, className: "text-purple-500", label: "Epic" },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Status config                                                             */
-/* -------------------------------------------------------------------------- */
-
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  todo: {
-    label: "To Do",
-    className:
-      "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  },
-  in_progress: {
-    label: "In Progress",
-    className:
-      "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
-  },
-  in_review: {
-    label: "In Review",
-    className:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
-  },
-  done: {
-    label: "Done",
-    className:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-  },
-};
 
 /* -------------------------------------------------------------------------- */
 /*  Helper: initials from name                                                */
@@ -727,7 +649,7 @@ export function BacklogTable({
                         <span
                           className={cn(
                             "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                            priorityConfig.className
+                            priorityConfig.badgeClassName
                           )}
                         >
                           {priorityConfig.label}
@@ -738,14 +660,14 @@ export function BacklogTable({
                       <TableCell className="py-4 px-4">
                         {task.assignee ? (
                           <div className="flex items-center gap-2">
-                            <Avatar size="sm">
+                            <Avatar className="size-7">
                               {task.assignee.avatar && (
                                 <AvatarImage
                                   src={task.assignee.avatar}
                                   alt={task.assignee.name}
                                 />
                               )}
-                              <AvatarFallback className="text-[10px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+                              <AvatarFallback className="text-[11px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
                                 {initials}
                               </AvatarFallback>
                             </Avatar>

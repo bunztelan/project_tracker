@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { PRIORITY_CONFIG } from "@/lib/task-constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -58,32 +59,6 @@ export type BoardData = {
   projectId: string;
   createdAt: string;
   columns: BoardColumn[];
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Priority helpers                                                          */
-/* -------------------------------------------------------------------------- */
-
-const PRIORITY_CONFIG: Record<
-  BoardTask["priority"],
-  { label: string; className: string }
-> = {
-  LOW: {
-    label: "Low",
-    className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-  },
-  MEDIUM: {
-    label: "Medium",
-    className: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
-  },
-  HIGH: {
-    label: "High",
-    className: "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300",
-  },
-  CRITICAL: {
-    label: "Critical",
-    className: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300",
-  },
 };
 
 /* -------------------------------------------------------------------------- */
@@ -200,14 +175,14 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
       <div className="mt-3 flex items-center gap-2">
         {/* Assignee avatar */}
         {task.assignee && (
-          <Avatar size="sm">
+          <Avatar className="size-7">
             {task.assignee.avatar && (
               <AvatarImage
                 src={task.assignee.avatar}
                 alt={task.assignee.name}
               />
             )}
-            <AvatarFallback className="text-[10px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+            <AvatarFallback className="text-[11px] bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
               {initials}
             </AvatarFallback>
           </Avatar>

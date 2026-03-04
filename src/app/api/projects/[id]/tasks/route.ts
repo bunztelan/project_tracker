@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { TaskPriority, TaskType } from "@/generated/prisma/client";
 import { z } from "zod";
 import { getSessionAndMembership } from "@/lib/api-utils";
+import { statusFromColumnName } from "@/lib/task-constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -243,14 +244,7 @@ export async function POST(
         select: { name: true },
       });
       if (column) {
-        const colNameLower = column.name.toLowerCase();
-        if (colNameLower.includes("progress")) {
-          status = "in_progress";
-        } else if (colNameLower.includes("review")) {
-          status = "in_review";
-        } else if (colNameLower.includes("done")) {
-          status = "done";
-        }
+        status = statusFromColumnName(column.name);
       }
     }
 

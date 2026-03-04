@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSessionAndMembership } from "@/lib/api-utils";
+import { MAX_COLUMNS, MIN_COLUMNS } from "@/lib/task-constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation schemas                                                        */
@@ -120,9 +121,9 @@ export async function PATCH(
     /*  ADD                                                                   */
     /* ---------------------------------------------------------------------- */
     if (data.action === "add") {
-      if (board.columns.length >= 6) {
+      if (board.columns.length >= MAX_COLUMNS) {
         return NextResponse.json(
-          { data: null, error: "Limit reached", message: "Maximum of 6 columns allowed." },
+          { data: null, error: "Limit reached", message: `Maximum of ${MAX_COLUMNS} columns allowed.` },
           { status: 400 }
         );
       }
@@ -150,9 +151,9 @@ export async function PATCH(
     /*  DELETE                                                                */
     /* ---------------------------------------------------------------------- */
     if (data.action === "delete") {
-      if (board.columns.length <= 4) {
+      if (board.columns.length <= MIN_COLUMNS) {
         return NextResponse.json(
-          { data: null, error: "Limit reached", message: "Minimum of 4 columns required." },
+          { data: null, error: "Limit reached", message: `Minimum of ${MIN_COLUMNS} columns required.` },
           { status: 400 }
         );
       }

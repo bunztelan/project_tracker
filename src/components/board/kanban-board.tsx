@@ -15,6 +15,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { MAX_COLUMNS, MIN_COLUMNS } from "@/lib/task-constants";
 import { KanbanColumn } from "./kanban-column";
 import { TaskCardOverlay, type BoardData, type BoardColumn, type BoardTask } from "./task-card";
 import { TaskDetailDialog } from "./task-detail-dialog";
@@ -480,12 +481,12 @@ export function KanbanBoard({
               onQuickAdd={handleQuickAdd}
               onRename={handleRenameColumn}
               onDelete={handleDeleteColumn}
-              canDelete={columns.length > 4 && col.tasks.length === 0}
+              canDelete={columns.length > MIN_COLUMNS && col.tasks.length === 0}
             />
           ))}
 
           {/* Add column button */}
-          {columns.length < 6 && columns.length > 0 && (
+          {columns.length < MAX_COLUMNS && columns.length > 0 && (
             <button
               onClick={handleAddColumn}
               className="flex w-[320px] shrink-0 flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/50 bg-muted/10 transition-colors hover:border-primary/40 hover:bg-muted/30 min-h-[200px]"
