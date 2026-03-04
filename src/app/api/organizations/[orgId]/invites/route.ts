@@ -86,7 +86,7 @@ export async function POST(
   const parsed = createInviteSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { data: null, error: "validation", message: parsed.error.errors[0].message },
+      { data: null, error: "validation", message: parsed.error.issues[0].message },
       { status: 400 }
     );
   }
