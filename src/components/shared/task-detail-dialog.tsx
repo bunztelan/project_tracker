@@ -35,6 +35,7 @@ import { PRIORITIES, TYPES } from "@/lib/task-constants";
 import type { BoardTask, BoardColumn } from "@/components/board/task-card";
 import { TaskAttachments } from "./task-attachments";
 import { TaskComments } from "./task-comments";
+import { SubtaskChecklist } from "./subtask-checklist";
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -179,6 +180,13 @@ export function TaskDetailDialog({
                     className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30 resize-none"
                   />
                 </div>
+
+                {/* Subtasks */}
+                <SubtaskChecklist
+                  projectId={projectId}
+                  taskId={task.id}
+                  members={members}
+                />
 
                 {/* Attachments */}
                 <TaskAttachments projectId={projectId} taskId={task.id} />
