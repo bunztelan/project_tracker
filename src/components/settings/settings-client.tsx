@@ -15,6 +15,9 @@ import {
   BarChart3,
   FileSpreadsheet,
   Loader2,
+  Mail,
+  Copy,
+  Check,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -88,12 +91,22 @@ interface Member {
   };
 }
 
+interface Invite {
+  id: string;
+  email: string;
+  role: string;
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
 interface SettingsClientProps {
   project: Project;
   features: Feature[];
   members: Member[];
   isAdminOrManager: boolean;
   currentUserId: string;
+  activeOrganizationId: string | null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -167,6 +180,7 @@ export function SettingsClient({
   members: initialMembers,
   isAdminOrManager,
   currentUserId,
+  activeOrganizationId,
 }: SettingsClientProps) {
   // -- General tab state --
   const [projectName, setProjectName] = useState(project.name);
@@ -197,6 +211,14 @@ export function SettingsClient({
   const [newMemberRole, setNewMemberRole] = useState("MEMBER");
   const [addingMember, setAddingMember] = useState(false);
   const [membersMessage, setMembersMessage] = useState<string | null>(null);
+
+  // -- Invites tab state --
+  const [invites, setInvites] = useState<Invite[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("MEMBER");
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [invitesLoaded, setInvitesLoaded] = useState(false);
+  const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   /* ---------------------------------------------------------------------- */
   /*  General tab handlers                                                   */
@@ -360,13 +382,65 @@ export function SettingsClient({
   );
 
   /* ---------------------------------------------------------------------- */
+  /*  Invites tab handlers                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  const fetchInvites = useCallback(async () => {
+    if (!activeOrganizationId) return;
+    try {
+      const res = await fetch(`/api/organizations/${activeOrganizationId}/invites`);
+      const data = await res.json();
+      if (data.data) setInvites(data.data);
+    } catch { /* ignore */ }
+    setInvitesLoaded(true);
+  }, [activeOrganizationId]);
+
+  const handleCreateInvite = useCallback(async () => {
+    if (!activeOrganizationId) return;
+    setInviteLoading(true);
+    try {
+      const res = await fetch(`/api/organizations/${activeOrganizationId}/invites`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: inviteEmail, role: inviteRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMembersMessage(data.message);
+        return;
+      }
+      setInviteEmail("");
+      fetchInvites();
+    } finally {
+      setInviteLoading(false);
+    }
+  }, [activeOrganizationId, inviteEmail, inviteRole, fetchInvites]);
+
+  const handleDeleteInvite = useCallback(async (inviteId: string) => {
+    if (!activeOrganizationId) return;
+    try {
+      await fetch(`/api/organizations/${activeOrganizationId}/invites/${inviteId}`, {
+        method: "DELETE",
+      });
+      setInvites((prev) => prev.filter((i) => i.id !== inviteId));
+    } catch { /* ignore */ }
+  }, [activeOrganizationId]);
+
+  const handleCopyInviteLink = useCallback((token: string) => {
+    const url = `${window.location.origin}/invite/${token}`;
+    navigator.clipboard.writeText(url);
+    setCopiedToken(token);
+    setTimeout(() => setCopiedToken(null), 2000);
+  }, []);
+
+  /* ---------------------------------------------------------------------- */
   /*  Render                                                                 */
   /* ---------------------------------------------------------------------- */
 
   return (
     <div className="mx-auto max-w-4xl p-6">
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="mb-6 grid w-full grid-cols-3">
+        <TabsList className="mb-6 grid w-full grid-cols-4">
           <TabsTrigger value="general" className="gap-2">
             <Settings2 className="size-4" />
             General
@@ -379,6 +453,16 @@ export function SettingsClient({
             <Users className="size-4" />
             Members
           </TabsTrigger>
+          {isAdminOrManager && activeOrganizationId && (
+            <TabsTrigger
+              value="invites"
+              className="gap-2"
+              onClick={() => { if (!invitesLoaded) fetchInvites(); }}
+            >
+              <Mail className="size-4" />
+              Invites
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* ================================================================ */}
@@ -766,6 +850,119 @@ export function SettingsClient({
             </div>
           </div>
         </TabsContent>
+        {/* ================================================================ */}
+        {/*  Invites Tab                                                     */}
+        {/* ================================================================ */}
+        {isAdminOrManager && activeOrganizationId && (
+          <TabsContent value="invites">
+            <div className="rounded-lg border bg-card p-6">
+              <h2 className="mb-1 text-base font-semibold">Team Invitations</h2>
+              <p className="mb-6 text-sm text-muted-foreground">
+                Invite people to join your organization.
+              </p>
+
+              {/* Create invite form */}
+              <div className="mb-6 flex items-end gap-3">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="invite-email">Email Address</Label>
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    placeholder="user@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                  />
+                </div>
+                <div className="w-[140px] space-y-2">
+                  <Label htmlFor="invite-role">Role</Label>
+                  <Select value={inviteRole} onValueChange={setInviteRole}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MEMBER">Member</SelectItem>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={handleCreateInvite}
+                  disabled={inviteLoading || !inviteEmail.trim()}
+                  className="bg-brand-600 hover:bg-brand-700 text-white"
+                >
+                  {inviteLoading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Mail className="size-4" />
+                  )}
+                  Send Invite
+                </Button>
+              </div>
+
+              {/* Pending invites list */}
+              <div className="rounded-lg border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Expires</TableHead>
+                      <TableHead className="w-[100px] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {invites.map((invite) => (
+                      <TableRow key={invite.id} className="h-14">
+                        <TableCell className="text-sm">{invite.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={getRoleBadgeClasses(invite.role)}>
+                            {invite.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {new Date(invite.expiresAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              onClick={() => handleCopyInviteLink(invite.token)}
+                              className="text-muted-foreground hover:text-foreground"
+                              title="Copy invite link"
+                            >
+                              {copiedToken === invite.token ? (
+                                <Check className="size-3.5 text-emerald-500" />
+                              ) : (
+                                <Copy className="size-3.5" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              onClick={() => handleDeleteInvite(invite.id)}
+                              className="text-muted-foreground hover:text-destructive"
+                              title="Delete invite"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {invites.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                          No pending invites.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

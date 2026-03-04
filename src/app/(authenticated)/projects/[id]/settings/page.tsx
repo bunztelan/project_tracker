@@ -110,6 +110,7 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
           members={members}
           isAdminOrManager={isAdminOrManager}
           currentUserId={session.user.id}
+          activeOrganizationId={session.user.activeOrganizationId ?? null}
         />
       </div>
     </div>
