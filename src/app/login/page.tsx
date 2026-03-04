@@ -4,7 +4,8 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, FolderKanban } from "lucide-react";
+import Image from "next/image";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,9 +60,14 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo / Brand */}
         <div className="animate-dash-fade-up mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-600 to-brand-500 shadow-lg shadow-brand-500/25">
-            <FolderKanban className="h-7 w-7 text-white" />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Planowiz"
+            width={56}
+            height={56}
+            className="mx-auto mb-4"
+            priority
+          />
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Planowiz
           </h1>

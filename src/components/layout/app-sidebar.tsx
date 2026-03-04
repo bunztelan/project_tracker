@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { featureStore } from "@/lib/feature-store";
 import {
-  FolderKanban,
   LayoutDashboard,
   FolderOpen,
   Kanban,
@@ -146,9 +146,13 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
       {/* App Header / Brand */}
       <SidebarHeader className="h-14 flex-row items-center px-4 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-3 group/brand">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-500 shadow-md shadow-brand-500/25 transition-shadow group-hover/brand:shadow-lg group-hover/brand:shadow-brand-500/35">
-            <FolderKanban className="h-4 w-4 text-white" />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Planowiz"
+            width={32}
+            height={32}
+            className="shrink-0"
+          />
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground">
