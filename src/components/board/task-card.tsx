@@ -178,21 +178,23 @@ export function TaskCard({ task, onClick, isDragOverlay }: TaskCardProps) {
         </p>
       )}
 
-      {/* Progress bar */}
-      <div className="mt-3">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[11px] text-muted-foreground font-medium">Progress</span>
-          <span className="text-[11px] text-muted-foreground font-medium">
-            {task.subtaskProgress}%
-          </span>
+      {/* Progress bar — only shown when task has subtasks */}
+      {task.totalSubtasks > 0 && (
+        <div className="mt-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] text-muted-foreground font-medium">Progress</span>
+            <span className="text-[11px] text-muted-foreground font-medium">
+              {task.subtaskProgress}%
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted/60">
+            <div
+              className="h-full rounded-full bg-teal-500 transition-all duration-300"
+              style={{ width: `${task.subtaskProgress}%` }}
+            />
+          </div>
         </div>
-        <div className="h-1.5 w-full rounded-full bg-muted/60">
-          <div
-            className="h-full rounded-full bg-teal-500 transition-all duration-300"
-            style={{ width: `${task.subtaskProgress}%` }}
-          />
-        </div>
-      </div>
+      )}
 
       {/* Bottom row: assignee avatar + counts */}
       <div className="mt-3 flex items-center gap-2">
