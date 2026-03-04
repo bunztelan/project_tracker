@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
 import { z } from "zod";
+import { requireAdmin } from "@/lib/api-utils";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -13,21 +12,6 @@ const updateUserSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   role: z.enum(["ADMIN", "MANAGER", "MEMBER"]).optional(),
 });
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, error: "Unauthorized" as const };
-  }
-  if (session.user.role !== Role.ADMIN) {
-    return { session: null, error: "Forbidden" as const };
-  }
-  return { session, error: null };
-}
 
 /* -------------------------------------------------------------------------- */
 /*  PATCH /api/admin/users/[userId] — update user role or name (Admin only)   */

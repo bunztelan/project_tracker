@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
 import { hash } from "bcryptjs";
 import { z } from "zod";
+import { requireAdmin } from "@/lib/api-utils";
 
 /* -------------------------------------------------------------------------- */
 /*  Validation                                                                */
@@ -16,21 +15,6 @@ const createUserSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["ADMIN", "MANAGER", "MEMBER"]).optional().default("MEMBER"),
 });
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, error: "Unauthorized" as const };
-  }
-  if (session.user.role !== Role.ADMIN) {
-    return { session: null, error: "Forbidden" as const };
-  }
-  return { session, error: null };
-}
 
 /* -------------------------------------------------------------------------- */
 /*  GET /api/admin/users — list all users (Admin only)                        */
