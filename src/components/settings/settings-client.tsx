@@ -129,11 +129,6 @@ const FEATURE_DEFINITIONS: Record<
     description: "Reporting dashboards",
     icon: BarChart3,
   },
-  excel: {
-    label: "Excel Visualization",
-    description: "Excel data upload and visualization",
-    icon: FileSpreadsheet,
-  },
 };
 
 const FEATURE_KEYS = Object.keys(FEATURE_DEFINITIONS);

@@ -63,7 +63,7 @@ export default function LoginPage() {
             <FolderKanban className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            ProjectTracker
+            Planowiz
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Manage your projects with clarity
@@ -139,7 +139,7 @@ export default function LoginPage() {
             Demo credentials
           </p>
           <p className="mt-0.5 text-xs text-brand-500/70 dark:text-brand-400/60">
-            admin@projecttracker.com / admin123
+            admin@planowiz.com / admin123
           </p>
         </div>
       </div>

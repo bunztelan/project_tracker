@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ProjectTracker",
+  title: "Planowiz",
   description: "Project management and tracking application",
 };
 

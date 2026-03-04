@@ -14,7 +14,6 @@ import {
   Zap,
   GanttChart,
   BarChart3,
-  FileSpreadsheet,
   Settings,
   LogOut,
   ChevronsUpDown,
@@ -88,12 +87,6 @@ const projectNavItems = [
     featureKey: "reports",
   },
   {
-    title: "Data",
-    segment: "data",
-    icon: FileSpreadsheet,
-    featureKey: "excel",
-  },
-  {
     title: "Settings",
     segment: "settings",
     icon: Settings,
@@ -159,7 +152,7 @@ export function AppSidebar({ featureToggles: featureTogglesProp, ...props }: App
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-foreground">
-                ProjectTracker
+                Planowiz
               </span>
               <span className="text-[10px] font-medium text-muted-foreground">
                 Manage with clarity

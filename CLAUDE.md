@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-ProjectTracker — a project management web app for a banking client proposal (5-15 users). Working prototype deliverable.
+Planowiz — a project management web app for a banking client proposal (5-15 users). Working prototype deliverable.
 
 ## Tech Stack
 
