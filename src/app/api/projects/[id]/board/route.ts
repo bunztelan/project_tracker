@@ -56,13 +56,13 @@ export async function GET(
                 },
                 _count: {
                   select: {
-                    subtasks: true,
                     comments: true,
                     attachments: true,
+                    checklistItems: true,
                   },
                 },
-                subtasks: {
-                  select: { status: true },
+                checklistItems: {
+                  select: { completed: true },
                 },
               },
             },
@@ -89,8 +89,8 @@ export async function GET(
         name: col.name,
         position: col.position,
         tasks: col.tasks.map((task) => {
-          const completedCount = task.subtasks.filter(
-            (s: { status: string }) => s.status === "done"
+          const completedCount = task.checklistItems.filter(
+            (s: { completed: boolean }) => s.completed
           ).length;
 
           return {
@@ -108,13 +108,13 @@ export async function GET(
             updatedAt: task.updatedAt,
             assignee: task.assignee,
             reporter: task.reporter,
-            subtaskCount: task._count.subtasks,
+            subtaskCount: task._count.checklistItems,
             commentCount: task._count.comments,
             attachmentCount: task._count.attachments,
-            totalSubtasks: task._count.subtasks,
+            totalSubtasks: task._count.checklistItems,
             completedSubtasks: completedCount,
-            subtaskProgress: task._count.subtasks > 0
-              ? Math.round((completedCount / task._count.subtasks) * 100)
+            subtaskProgress: task._count.checklistItems > 0
+              ? Math.round((completedCount / task._count.checklistItems) * 100)
               : 0,
             parentId: task.parentId,
             sprintId: task.sprintId,
