@@ -9,7 +9,7 @@ import { getSessionAndMembership } from "@/lib/api-utils";
 
 const ALLOWED_EXTENSIONS = new Set([
   "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
-  "csv", "txt", "png", "jpg", "jpeg", "gif", "svg",
+  "csv", "txt", "png", "jpg", "jpeg", "gif",
 ]);
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
